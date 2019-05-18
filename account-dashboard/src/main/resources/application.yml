@@ -3,7 +3,7 @@ wangdm:
       host: www.wangdm.cn
       dbname: WangdmDoc
 server:
-   port: 6088
+   port: 6062
 spring:
    output:
       ansi:
