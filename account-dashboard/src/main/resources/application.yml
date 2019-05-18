@@ -1,0 +1,83 @@
+wangdm:
+   datasource:
+      host: www.wangdm.cn
+      dbname: WangdmDoc
+server:
+   port: 6088
+spring:
+   output:
+      ansi:
+         enabled: always
+   resources:
+      chain:
+         strategy:
+            content:
+               enabled: true
+               paths: /**
+      cache:
+         cachecontrol:
+            cache-public: true
+            max-age: 864000
+   servlet:
+      multipart:
+         enabled: true
+         max-file-size: 1GB
+         max-request-size: 1GB
+         file-size-threshold: 0B
+   session:
+      store-type: redis
+      timeout: 100
+      redis:
+         flush-mode: on-save
+         namespace: doc:account:session
+   redis:
+      host: www.wangdm.cn
+      port: 6379
+   jpa:
+      show-sql: true
+      hibernate:
+         ddl-auto: update
+         naming:
+            physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+      properties:
+         hibernate:
+            format_sql: false
+   datasource:
+      url: jdbc:mysql://${wangdm.datasource.host}:3306/${wangdm.datasource.dbname}?useUnicode=true&characterEncoding=utf-8&useSSL=false
+      username: wangdm
+      password: wangdm
+      max-idle: 10
+      min-idle: 5
+      max-wait: 10000
+      initial-size: 5
+      validation-query: SELECT 1
+      test-on-borrow: false
+      test-while-idle: true
+      time-between-eviction-runs-millis: 18800
+      jdbc-interceptors: ConnectionState;SlowQueryReport(threshold=0)
+      hikari: 
+         minimum-idle: 2
+         maximum-pool-size: 10
+         connection-test-query: SELECT 1
+         auto-commit: true
+         idle-timeout: 60000
+         connection-timeout: 10000
+         pool-name: DocHikariCP
+         max-lifetime: 1800000
+   mail:
+      host: smtpdm.aliyun.com
+      port: 465 #端口号465或587
+      username: notify@deviceonline.cn
+      password: Ming520Ling
+      protocol: smtp
+      default-encoding: UTF-8
+      properties:
+         mail:
+            smtp:
+               auth: true
+               ssl:
+                  enable: true
+logging:
+   level:
+      root: info
+      cn.wangdm: debug

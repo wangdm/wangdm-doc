@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title></title>
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/css/layui.css')}">
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/ext/dtree/dtree.css')}">
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/ext/dtree/font/iconfont.css')}">
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/font/iconfont.css')}">
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/css/index.css')}">
+</head>
+<body class="layui-layout-body">
+
+	<div class="content-wrapper">
+		
+		<div class="content-main">
+			<table class="layui-hide" id="MainTable" lay-filter="MainTable"></table>
+			<script type="text/html" id="MainTableToolBar">
+				<div class="layui-btn-container">
+			  		<div class="layui-form-item">
+    					<div class="layui-inline">
+							<button class="layui-btn layui-btn-sm" lay-event="add">添加</button>
+							<button class="layui-btn layui-btn-sm" lay-event="delete">删除</button>
+			  			</div>
+					</div>
+				</div>
+			</script>
+			<script type="text/html" id="MainTableRowToolBar">
+				<button class="layui-btn layui-btn-xs layui-btn-normal" lay-event="perm">权限</button>
+				<button class="layui-btn layui-btn-xs layui-btn-normal" lay-event="menu">菜单</button>
+				<button class="layui-btn layui-btn-xs layui-btn-normal" lay-event="modify">修改</button>
+				<button class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">删除</button>
+			</script>
+		</div>
+
+	</div>
+	<div id="EditDialog" style="display: none">
+	    <div class="layui-card">
+			<div class="layui-card-body">
+			<form class="layui-form layui-form-pane layui-form-compact" lay-filter="EditDialog" action="/">
+			  <div class="layui-form-item">
+			    <label class="layui-form-label">角色名</label>
+			    <div class="layui-input-block">
+			      <input type="hidden" name="id">
+			      <input type="text" name="title" placeholder="请输入" autocomplete="off" class="layui-input" lay-verify="required">
+			    </div>
+			  </div>
+			  <div class="layui-form-item">
+			    <label class="layui-form-label">角色标志</label>
+			    <div class="layui-input-block">
+			      <input type="text" name="name" placeholder="请输入" autocomplete="off" class="layui-input" lay-verify="required">
+			    </div>
+			  </div>
+			  <div class="layui-form-item">
+			    <label class="layui-form-label">说明</label>
+			    <div class="layui-input-block">
+      				<textarea  name="desc" placeholder="请输入内容" class="layui-textarea"></textarea>
+			    </div>
+			  </div>
+			  <div class="layui-btn-container layui-form-item">
+				<button class="layui-btn layui-btn-sm layui-btn-normal layui-btn-right" lay-submit="" lay-filter="Save">保存</button>
+			  </div>
+			</form>
+			</div>
+	    </div>
+	</div>
+	
+	<div id="PermDialog" style="display: none;overflow: auto;max-height:500px;">
+	    <div class="layui-card">
+			<div class="layui-card-body">
+				<div style="overflow: auto;" id="PermTreeWrapper">
+					<ul id="PermTree" class="dtree" data-id="0"></ul>
+				</div>
+			</div>
+	    </div>
+	</div>
+	<div id="MenuDialog" style="display: none;overflow: auto;max-height:500px;">
+	    <div class="layui-card">
+			<div class="layui-card-body">
+				<div style="overflow: auto;" id="MenuTreeWrapper">
+					<ul id="MenuTree" class="dtree" data-id="0"></ul>
+				</div>
+			</div>
+	    </div>
+	</div>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/layui.js')}"></script>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/js/smart.js')}"></script>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/js/dict.js')}"></script>
+<script th:inline="none">
+layui.use(['table','form','dtree'], function(){
+	var $ = layui.jquery;
+	var table = layui.table;
+	var form = layui.form;
+	var dtree = layui.dtree;
+	
+	var mainTable;
+	var mainTableData;
+	var editDlgIdx, permDlgIdx, roleDlgIdx;
+	var baseurl = '/api/role/';
+	
+	var permTree;
+	var permTreeData;
+	$.get("/api/perm/tree", function(result){
+		permTreeData = result.data;
+	});
+
+	var menuTree;
+	var menuTreeData;
+	$.get("/api/menu/tree", function(result){
+		menuTreeData = result.data;
+	});
+      
+	mainTable = table.render({
+		elem: '#MainTable',
+		toolbar: '#MainTableToolBar',
+		url: baseurl,
+		page: true,
+		height:'full-0',
+		cols: [[
+			{type:'checkbox', fixed: 'left'},
+			{field: 'id', title: 'ID'},
+			{field: 'title', title: '角色'},
+			{field: 'name', title: '角色标志'},
+			{field: 'type', title: '角色类型'},
+			{field: 'desc', title: '说明'},
+			{fixed: 'right', title:'操作', toolbar:'#MainTableRowToolBar', width:210}
+		]]
+	});
+	
+	var dlgOption = {
+			type: 1,
+			title: '添加角色',
+			data:{},
+			maxWidth: 780,
+			content: $('#EditDialog'),
+			yes: function(index, layero){
+				layer.msg("Save");
+				layer.close(index);
+			},
+			cancel: function(index, layero){
+				layer.confirm("确认退出编辑？",function(idx){
+					layer.close(idx);
+					layer.close(index);
+				});
+				return false;
+			},
+			success: function(layero, index){
+				var devicetype = dict["devicetype"];
+				$("select[name='type']").empty();
+				for(var idx in devicetype){
+					$("select[name='type']").append("<option value='"+devicetype[idx].value+"'>"+devicetype[idx].name+"</option>");
+				}
+				var connectmethod = dict["connectmethod"];
+				$("select[name='method']").empty();
+				for(var idx in connectmethod){
+					$("select[name='method']").append("<option value='"+connectmethod[idx].value+"'>"+connectmethod[idx].name+"</option>");
+				}
+				form.render('select');
+				if(this.data){
+					form.val("EditDialog",this.data);
+				}else{
+					$("#EditDialog input").val("");
+				}
+			}
+		}
+
+	var permOption = {
+			type: 1,
+			title: '修改权限',
+			data:{},
+			area: '400px',
+			offset: '100px',
+			content: $('#PermDialog'),
+			btn: ['确定'],
+			yes: function(index, layero){
+				var roleId = $("#PermTree").data("id");
+				var params = dtree.getCheckbarNodesParam("PermTree");
+				var ids = [];
+				for(var i in params){
+					if(params[i].parentId > 0){
+						ids.push(params[i].parent);
+					}
+				}
+				$.ajax({
+					type: "PUT",
+					url: "/api/role/" + roleId + "/perm",
+					data: JSON.stringify(ids),
+					dataType: "json",
+					contentType:"application/json",
+					success: function(data) {
+						layer.msg("Success");
+					}
+				});
+				$("#PermDialog").hide();
+				layer.close(index);
+			},
+			cancel: function(index, layero){
+				$("#PermDialog").hide();
+			},
+			success: function(layero, index){
+				var roleId = $("#PermTree").data("id");
+				$.get("/api/role/" + roleId + "/perm", function(result){
+					permTree = dtree.render({
+						elem: "#PermTree",
+						data: result.data,
+						dataStyle: "layuiStyle",
+						dataFormat: "list",
+						checkbar: true,  
+						checkbarType: "self",
+						initLevel: "1",
+						defaultRequest:dtreeDefaultRequest,
+						request: dtreeRequest,
+						response:  {
+							statusName: "code", //返回标识
+							statusCode: 0, //返回码
+							message: "desc", //返回信息
+							rootName: "data", //根节点名称
+							treeId: "id", //节点ID
+							parentId: "parentId", //父节点ID
+							title: "title", //节点名称
+							childName: "children", //子节点名称
+							isLast: "leaf",
+							spread: "spread", //节点展开状态（v2.4.5_finally_beta版本新增。true：展开，false：不展开，布尔值，非必填）
+							checkArr: "checkArr" //复选框列表（开启复选框，默认是json数组。必填）
+						}
+					});
+				});
+			}
+		}
+
+	var menuOption = {
+			type: 1,
+			title: '修改菜单',
+			data:{},
+			area: '400px',
+			offset: '100px',
+			content: $('#MenuDialog'),
+			btn: ['确定'],
+			yes: function(index, layero){
+				var roleId = $("#MenuTree").data("id");
+				var params = dtree.getCheckbarNodesParam("MenuTree");
+				var ids = [];
+				for(var i in params){
+					ids.push(params[i].parent);
+				}
+				$.ajax({
+					type: "PUT",
+					url: "/api/role/" + roleId + "/menu",
+					data: JSON.stringify(ids),
+					dataType: "json",
+					contentType:"application/json",
+					success: function(data) {
+						layer.msg("Success");
+					}
+				});
+				$("#MenuDialog").hide();
+				layer.close(index);
+			},
+			cancel: function(index, layero){
+				$("#MenuDialog").hide();
+			},
+			success: function(layero, index){
+				var roleId = $("#MenuTree").data("id");
+				$.get("/api/role/" + roleId + "/menu", function(result){
+					mainTree = dtree.render({
+						elem: "#MenuTree",
+						data: result.data,
+						dataStyle: "layuiStyle",
+						dataFormat: "list",
+						checkbar: true,
+						checkbarType: "self",
+						initLevel: "1",
+						defaultRequest:dtreeDefaultRequest,
+						request: dtreeRequest,
+						response:  {
+							statusName: "code", //返回标识
+							statusCode: 0, //返回码
+							message: "desc", //返回信息
+							rootName: "data", //根节点名称
+							treeId: "id", //节点ID
+							parentId: "parentId", //父节点ID
+							title: "title", //节点名称
+							childName: "children", //子节点名称
+							isLast: "leaf",
+							spread: "spread", //节点展开状态（v2.4.5_finally_beta版本新增。true：展开，false：不展开，布尔值，非必填）
+							checkArr: "checkArr" //复选框列表（开启复选框，默认是json数组。必填）
+						}
+					});
+				});
+			}
+		}
+	
+	//监听表单提交
+	form.on('submit(Save)', function(data){
+		var model = data.field;
+		if(model.id > 0){
+			layer.close(editDlgIdx);
+			$.ajax({
+				type: "PUT",
+				url: baseurl + model.id,
+				data: JSON.stringify(model),
+				success: function(data) {
+					table.reload('MainTable');
+				},
+				dataType: "json",
+				contentType:"application/json"
+			});
+		}else{
+			$.ajax({
+				type: "POST",
+				url: baseurl,
+				data: JSON.stringify(model),
+				success: function(data) {
+					table.reload('MainTable', {
+						page: {
+							curr: 1 //重新从第 1 页开始
+						}
+					});
+				},
+				dataType: "json",
+				contentType:"application/json"
+			});
+		}
+		return false;
+	});
+
+	//Table工具栏事件
+	table.on('toolbar(MainTable)', function(obj){
+		switch(obj.event){
+			case 'add':
+				dlgOption.title = '添加角色';
+				dlgOption.data = null;
+				editDlgIdx = layer.open(dlgOption);
+				break;
+			case 'delete':
+				var status = table.checkStatus('MainTable');
+				if(status.data.length<=0){
+					layer.msg("未选中任何角色");
+					break;
+				}
+				layer.confirm('确认删除所选角色？', {icon: 2, title:'删除'}, function(index){
+					layer.close(index);
+					status.data.forEach(function(data){
+						$.ajax({
+							type: "DELETE",
+							url: baseurl + data.id,
+							success: function(data) {
+								table.reload('MainTable');
+							}
+						});
+					});
+				});
+				break;
+		};
+	});//监听行工具事件
+	table.on('tool(MainTable)', function(obj){
+		switch(obj.event){
+		case 'perm':
+			$("#PermTree").data("id", obj.data.id);
+			permDlgIdx = layer.open(permOption);
+			break;
+		case 'menu':
+			$("#MenuTree").data("id", obj.data.id);
+			menuDlgIdx = layer.open(menuOption);
+			break;
+		case 'modify':
+			dlgOption.title = '编辑角色';
+			dlgOption.data = obj.data;
+			editDlgIdx = layer.open(dlgOption);
+			break;
+		case 'delete':
+			layer.confirm('确认删除角色：'+obj.data.title, {icon: 2, title:'删除'}, function(index){
+				layer.close(index);
+				$.ajax({
+					type: "DELETE",
+					url: baseurl+obj.data.id,
+					success: function(data) {
+						obj.del();
+					}
+				});
+			});
+			break;
+		};
+	});
+});
+</script>
+</body>
+</html>

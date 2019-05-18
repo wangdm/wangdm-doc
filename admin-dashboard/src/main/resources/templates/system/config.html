@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title></title>
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/css/layui.css')}">
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/ext/dtree/dtree.css')}">
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/ext/dtree/font/iconfont.css')}">
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/font/iconfont.css')}">
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/css/index.css')}">
+</head>
+<body class="layui-layout-body" style="height:100%; overflow:auto">
+
+	<div class="content-wrapper system-config">
+	<div class="layui-collapse">
+	  <div class="layui-colla-item">
+	    <h2 class="layui-colla-title">系统信息</h2>
+	    <div class="layui-colla-content layui-show">
+	    	<form class="layui-form layui-form-pane" action="" lay-filter="System">
+			  <div class="layui-form-item">
+			    <label class="layui-form-label">系统标题</label>
+			    <div class="layui-input-inline">
+			      <input type="text" name="title" lay-verify="required" placeholder="请输入" class="layui-input">
+			    </div>
+			  </div>
+			  <div class="layui-form-item">
+			    <label class="layui-form-label">公司名称</label>
+			    <div class="layui-input-inline">
+			      <input type="text" name="company" lay-verify="required" placeholder="请输入" class="layui-input">
+			    </div>
+			  </div>
+			  <div class="layui-form-item">
+			    <label class="layui-form-label">公司网址</label>
+			    <div class="layui-input-inline">
+			      <input type="text" name="website" placeholder="请输入" class="layui-input">
+			    </div>
+			  </div>
+			  <div class="layui-form-item">
+			    <label class="layui-form-label">版权信息</label>
+			    <div class="layui-input-inline">
+			      <input type="text" name="copyright" placeholder="请输入" class="layui-input">
+			    </div>
+			  </div>
+			  <div class="layui-form-item">
+			    <button class="layui-btn" lay-submit="" lay-filter="SaveSystem">保存</button>
+			  </div>
+	    	</form>
+		</div>
+	  </div>
+	</div>
+	<div class="layui-collapse">
+	  <div class="layui-colla-item">
+	    <h2 class="layui-colla-title">门禁控制</h2>
+	    <div class="layui-colla-content layui-show">内容区域</div>
+	  </div>
+	</div>
+	<div class="layui-collapse">
+	  <div class="layui-colla-item">
+	    <h2 class="layui-colla-title">存储设置</h2>
+	    <div class="layui-colla-content layui-show">
+	    	<form class="layui-form layui-form-pane" action="" lay-filter="Storage">
+			  <div class="layui-form-item">
+			    <label class="layui-form-label">图片存储位置</label>
+			    <div class="layui-input-inline">
+			      <input type="radio" name="storagePosition" value="native" title="本地服务器" checked="">
+			      <input type="radio" name="storagePosition" value="aliyun" title="阿里云">
+			    </div>
+			  </div>
+			  <div class="layui-form-item">
+			    <label class="layui-form-label">头像访问域名</label>
+			    <div class="layui-input-inline">
+			      <input type="text" name="portraitDomain" placeholder="请输入" class="layui-input">
+			    </div>
+			  </div>
+			  <div class="layui-form-item">
+			    <label class="layui-form-label">头像存储桶</label>
+			    <div class="layui-input-inline">
+			      <input type="text" name="portraitBucket" placeholder="请输入" class="layui-input">
+			    </div>
+			  </div>
+			  <div class="layui-form-item">
+			    <label class="layui-form-label">头像存储路径</label>
+			    <div class="layui-input-inline">
+			      <input type="text" name="portraitPath" class="layui-input">
+			    </div>
+			  </div>
+			  <div class="layui-form-item">
+			    <label class="layui-form-label">抓拍图片访问域名</label>
+			    <div class="layui-input-inline">
+			      <input type="text" name="snapshotDomain" class="layui-input">
+			    </div>
+			  </div>
+			  <div class="layui-form-item">
+			    <label class="layui-form-label">抓拍图片存储桶</label>
+			    <div class="layui-input-inline">
+			      <input type="text" name="snapshotBucket" placeholder="请输入" class="layui-input">
+			    </div>
+			  </div>
+			  <div class="layui-form-item">
+			    <label class="layui-form-label">抓拍图片存储路径</label>
+			    <div class="layui-input-inline">
+			      <input type="text" name="snapshotPath" placeholder="请输入" class="layui-input">
+			    </div>
+			  </div>
+			  <div class="layui-form-item">
+			    <label class="layui-form-label">Endpoint</label>
+			    <div class="layui-input-inline">
+			      <input type="text" name="endpoint" placeholder="请输入" class="layui-input">
+			    </div>
+			  </div>
+			  <div class="layui-form-item">
+			    <label class="layui-form-label">AccessKey ID</label>
+			    <div class="layui-input-inline">
+			      <input type="text" name="accessKeyId" placeholder="请输入" class="layui-input">
+			    </div>
+			  </div>
+			  <div class="layui-form-item">
+			    <label class="layui-form-label">AccessKey Secret</label>
+			    <div class="layui-input-inline">
+			      <input type="text" name="accessKeySecret" placeholder="请输入" class="layui-input">
+			    </div>
+			  </div>
+			  <div class="layui-form-item">
+			    <button class="layui-btn" lay-submit="" lay-filter="SaveStorage">保存</button>
+			  </div>
+	    	</form>
+		</div>
+	  </div>
+	</div>
+	</div>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/layui.js')}"></script>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/js/smart.js')}"></script>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/js/dict.js')}"></script>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/js/config.js')}"></script>
+<script th:inline="none">
+layui.use(['table','element','form','laydate'], function(){
+	var $ = layui.jquery;
+	var element = layui.element;
+	var form = layui.form;
+	var laydate = layui.laydate;
+	
+	Config.init(function(data){
+		console.log(data);
+		form.val("System", config.system);
+		form.val("Storage", config.storage);
+	});
+	  
+	//监听表单提交
+	form.on('submit(SaveSystem)', function(data){
+		var config = data.field;
+		$.ajax({
+		    url: "/api/config/system",
+		    type: 'PUT',
+		    data: JSON.stringify(config),
+	        contentType: "application/json; charset=utf-8",  
+	        dataType: "json", 
+		    success: function(result) {
+		    	layer.msg("成功");
+		    }
+		});
+		return false;
+	});
+	form.on('submit(SaveStorage)', function(data){
+		var config = data.field;
+		$.ajax({
+		    url: "/api/config/storage",
+		    type: 'PUT',
+		    data: JSON.stringify(config),
+	        contentType: "application/json; charset=utf-8",  
+	        dataType: "json", 
+		    success: function(result) {
+		    	layer.msg("成功");
+		    }
+		});
+		return false;
+	});
+});
+</script>
+</body>
+</html>

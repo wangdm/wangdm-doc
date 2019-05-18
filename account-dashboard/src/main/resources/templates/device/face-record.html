@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="x-ua-compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
+<title></title>
+<link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/css/layui.css')}">
+<link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/ext/dtree/dtree.css')}">
+<link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/ext/dtree/font/iconfont.css')}">
+<link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/font/iconfont.css')}">
+<link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/css/index.css')}">
+<link rel="stylesheet" href="https://g.alicdn.com/de/prismplayer/2.8.1/skins/default/aliplayer-min.css" />
+<style type="text/css">
+@media screen and (min-width: 992px){
+    #DeviceRecord{
+        margin:auto;
+    }
+}
+@media screen and (min-width: 1200px){
+    #DeviceRecord{
+        margin:auto 10px;
+        
+    }
+}
+#DeviceConfig .layui-input-block{
+    margin-left: 160px;
+}
+#DeviceConfig .layui-form-label{
+    width: 160px;
+    color:#ffffff;
+    background-color:#009688;
+    border-color:#009688;
+}
+#DeviceInfo .layui-input-block{
+    margin-left: 120px;
+}
+#DeviceInfo .layui-form-label{
+    width: 120px;
+    color:#ffffff;
+    background-color:#009688;
+    border-color:#009688;
+}
+</style>
+</head>
+<body>
+<div class="layui-row">
+    <div class="layui-col-lg6 layui-col-md12">
+        <div class="layui-row" style="max-width:960px;margin:auto">
+            <div class="layui-col-md12">
+                <div class="layui-row" style="background-color:#000000;overflow: hidden;">
+                    <div class="prism-player" id="VideoPlayer" style="margin:auto"></div>
+                </div>
+                <div class="layui-row" style="margin:10px auto;">
+                    <button class="layui-btn">打开视频</button>
+                    <button class="layui-btn">关闭视频</button>
+                    <button class="layui-btn">抓拍图片</button>
+                    <button class="layui-btn">刷新配置</button>
+                </div>
+            </div>
+            <div class="layui-col-md12">
+                <div id="DeviceConfig" style="max-height:calc(100% - 600px);overflow:auto;border:1px solid #e6e6e6;border-top:5px solid #009688"></div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-col-md12 layui-hide-lg" style="height:20px;"></div>
+    <div class="layui-col-lg6 layui-col-md12">
+        <div class="layui-row" style="max-width:960px;margin:auto;">
+            <div id="DeviceRecord" style="border-top:5px solid #009688">
+	            <table class="layui-hide" id="MainTable" lay-filter="MainTable"></table>
+	            <script type="text/html" id="MainTableToolBar">
+				<div style="font-size: 18px;font-weight:bold">识别记录</div>
+			</script>
+			</div>
+        </div>
+    </div>
+</div>
+<script type="text/html" id="portraitTpl">
+    <div class="layui-cell-image">
+    {{#  if(d.result === 1){ }}
+        <img src="{{d.portrait}}" >
+    {{# } }}
+    </div>
+</script>
+<script type="text/html" id="snapshotTpl">
+    <div class="layui-cell-image"><img src="{{d.snapshot}}" ></div>
+</script>
+<script type="text/javascript" charset="utf-8" src="https://g.alicdn.com/de/prismplayer/2.8.1/aliplayer-min.js"></script>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/layui.js')}"></script>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/js/smart.js')}"></script>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/js/model.js')}"></script>
+<script>
+layui.use([ 'table','form','element','laydate','player' ], function() {
+	var $ = layui.jquery;
+	var table = layui.table;
+	var form = layui.form;
+	var element = layui.element;
+	var laydate = layui.laydate;
+    var player = layui.player;
+
+	var criteria = {};
+	
+	var device, product;
+	var deviceurl = '/api/account/device/';
+	var producturl = '/api/account/product/';
+	var baseurl = '/api/account/product/';
+	
+	var params = getParams(window.location.href);
+	criteria.deviceId = params["id"];
+	
+	$.ajax({
+		type: "GET",
+		url: deviceurl + params["id"],
+		dataType: "json",
+		contentType:"application/json",
+		success: function(data) {
+		    device = data.data;
+// 			console.log(device);
+			$.ajax({
+				type: "GET",
+				url: producturl + device.productId,
+				dataType: "json",
+				contentType:"application/json",
+				success: function(data) {
+				    product = data.data;
+// 					console.log(product);
+					//构建配置界面
+					try{
+						var model = JSON.parse(product.config);
+// 						console.log(model);
+						buildConfigUI($('#DeviceConfig'), model, true);
+						var config = JSON.parse(device.config);
+						$.each(config, function(name, val) {  
+							form.val(name, val);
+						});
+						form.render();
+					}catch{
+						layer.open({
+							  title: '错误'
+							  ,icon: 2
+							  ,content: '设备配置模型加载失败！'
+							});
+						return;
+					}
+				}
+			});
+			
+			mainTable = table.render({
+				elem: '#MainTable',
+ 				toolbar: '#MainTableToolBar',
+				url: baseurl,
+				where: criteria,
+				page: true,
+				height:'full-5',
+				cols: [ [
+					{field: 'id', title: 'ID'},
+					{field: 'personName', title: '姓名'},
+					{field: 'sectionName', title: '区域'},
+					{field: 'deviceName', title: '设备'},
+					{field: 'score', title: '相似度'},
+					{field: 'snapTime', title: '出入时间',},
+// 					{field: 'portrait', title: '人员头像', templet: '#portraitTpl'},
+// 					{field: 'snapshot', title: '抓拍头像', templet: '#snapshotTpl'},
+					{field: 'result', title: '识别结果', templet: function(d){
+						if(d.result == 1){
+							return '<i class="layui-icon icon-success" style="color:#009688;font-size:28px"></i>';
+						}else{
+							return '<i class="layui-icon icon-fail" style="color:#FF5722;font-size:28px"></i>';
+						}
+				    }},
+				] ],
+				done: function(){
+// 					form.val('SearchPanel', criteria);
+				}
+			});
+			
+			player.render("VideoPlayer", {source: "http://www.deviceonline.cn/live/hls.m3u8"});
+		}
+	});
+	
+	$("body").resize(function(){
+		var height = $("body").height() - 514;
+		var width = $("body").width();
+		if(width <= 1182){
+			height = 400;
+		}else{
+			if(height < 250){
+				height = 250;
+			}
+		}
+		$("#DeviceConfig").css("max-height", height); 
+	});
+	
+});
+</script>
+</body>

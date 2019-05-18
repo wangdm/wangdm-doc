@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title></title>
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/css/layui.css')}">
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/ext/dtree/dtree.css')}">
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/ext/dtree/font/iconfont.css')}">
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/font/iconfont.css')}">
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/css/index.css')}">
+</head>
+<body class="layui-layout-body">
+
+	<div class="content-wrapper">
+		
+		<div class="content-main">
+			<table class="layui-hide" id="MainTable" lay-filter="MainTable"></table>
+			<script type="text/html" id="MainTableToolBar">
+				<form class="layui-form layui-form-pane layui-form-compact" lay-filter="SearchPanel" action="/">
+  					<div class="layui-form-item">
+		    			<div class="layui-inline">
+		      				<label class="layui-form-label">操作时间</label>
+		      				<div class="layui-input-inline">
+		        				<input type="text" name="startTime" id="startTime" placeholder="" autocomplete="off" class="layui-input">
+		      				</div>
+		      				<div class="layui-form-mid">-</div>
+		      				<div class="layui-input-inline">
+		        				<input type="text" name="endTime" id="endTime" placeholder="" autocomplete="off" class="layui-input">
+		      				</div>
+		    			</div>
+   						<div class="layui-inline">
+		    				<div class="layui-input-inline">
+			      				<input type="hidden" name="personId" value="0">
+		      					<input type="text" name="search" placeholder="用户名" data-url="/api/person" data-field="fullname,idNum,icNum" class="layui-input" autocomplete="off">
+		    				</div>
+							<button class="layui-btn layui-btn-sm" lay-submit="" lay-filter="Search">搜索</button>
+		  				</div>
+		  			</div>
+				</form>
+			</script>
+		</div>
+
+	</div>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/layui.js')}"></script>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/js/smart.js')}"></script>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/js/dict.js')}"></script>
+<script th:inline="none">
+layui.use(['table','form','laydate'], function(){
+	var $ = layui.jquery;
+	var table = layui.table;
+	var form = layui.form;
+	var laydate = layui.laydate;
+	
+	var mainTable;
+	var mainTableData;
+	var baseurl = '/api/log/operation';
+	var currentTime = new Date();
+	var startTime =  new Date();
+	startTime.setHours(0, 0, 0, 0);
+	var search = {startTime: startTime.format(), endTime: currentTime.format()};
+      
+	mainTable = table.render({
+		elem: '#MainTable',
+		toolbar: '#MainTableToolBar',
+		url: baseurl,
+		data: {},
+		page: true,
+		where: search,
+		height:'full-0',
+		cols: [[
+			{type:'checkbox', fixed: 'left'},
+			{field: 'id', title: 'ID'},
+			{field: 'username', title: '用户'},
+			{field: 'module', title: '模块'},
+			{field: 'operation', title: '操作'},
+			{field: 'desc', title: '描述'},
+			{field: 'time', title: '操作时间'}
+		]],
+		done: function(res, curr, count){
+			laydate.render({
+				elem: '#startTime',
+				type: 'datetime',
+				format: 'yyyy-MM-dd HH:mm:ss',
+				value: new Date()
+			});
+			laydate.render({
+				elem: '#endTime',
+				type: 'datetime',
+				format: 'yyyy-MM-dd HH:mm:ss',
+				value: new Date()
+			});
+			form.val('SearchPanel', search);
+			enableSearch();
+		}
+	});
+	  
+	//监听表单提交
+	form.on('submit(Search)', function(data){
+		search = data.field;
+		table.reload('MainTable', {where:search});
+		return false;
+	});
+
+	//Table工具栏记录
+	table.on('toolbar(MainTable)', function(obj){
+		switch(obj.event){
+			case 'delete':
+				var status = table.checkStatus('MainTable');
+				if(status.data.length<=0){
+					layer.msg("未选中任何记录");
+					break;
+				}
+				layer.confirm('确认删除所选记录？', {icon: 2, title:'删除'}, function(index){
+					layer.close(index);
+					status.data.forEach(function(data){
+						$.ajax({
+							type: "DELETE",
+							url: baseurl + data.id,
+							success: function(data) {
+								table.reload('MainTable');
+							}
+						});
+					});
+				});
+				break;
+		};
+	});
+});
+</script>
+</body>
+</html>

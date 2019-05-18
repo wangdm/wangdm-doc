@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title></title>
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/css/layui.css')}">
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/ext/dtree/dtree.css')}">
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/ext/dtree/font/iconfont.css')}">
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/font/iconfont.css')}">
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/css/index.css')}">
+</head>
+<body class="layui-layout-body">
+
+	<div class="content-wrapper">
+		
+		<div class="content-main">
+			<table class="layui-hide" id="MainTable" lay-filter="MainTable"></table>
+			<script type="text/html" id="MainTableToolBar">
+				<form class="layui-form layui-form-pane layui-form-compact" lay-filter="SearchPanel" action="/">
+                    <div class="layui-form-item">
+    				<div class="layui-inline">
+                        <label class="layui-form-label">应用</label>
+			    		<div class="layui-input-inline">
+			      			<select name="appId" lay-url="/api/account/app" lay-filter="appId" placeholder="请选择"  class="layui-input"></select>
+			    		</div>
+			  		</div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">产品</label>
+                        <div class="layui-input-inline">
+                            <select name="productId" lay-url="/api/account/product" lay-filter="productId" placeholder="请选择"  class="layui-input"></select>
+                        </div>
+                    </div>
+   					<div class="layui-inline">
+		    			<div class="layui-input-inline">
+		      				<input type="text" name="search" placeholder="设备名/UUID/Serial"  class="layui-input" autocomplete="off">
+		    			</div>
+		  			</div>
+    				<div class="layui-inline">
+                        <button class="layui-btn layui-btn-sm" lay-submit="" lay-filter="Search">搜索</button>
+						<button type="button" class="layui-btn layui-btn-sm" lay-event="add">添加</button>
+						<button type="button" class="layui-btn layui-btn-sm" lay-event="delete">删除</button>
+						<button type="button" class="layui-btn layui-btn-sm" lay-event="upgrade">升级</button>
+						<button type="button" class="layui-btn layui-btn-sm" lay-event="config">配置</button>
+			  		</div>
+                    </div>
+				</form>
+			</script>
+			<script type="text/html" id="MainTableRowToolBar">
+				{{#  if(d.productId > 0){ }}
+				<button class="layui-btn layui-btn-xs" lay-event="config">配置</button>
+				{{# } }}
+				<button class="layui-btn layui-btn-xs layui-btn-normal" lay-event="modify">修改</button>
+				{{#  if(d.status === 1){ }}
+				<button class="layui-btn layui-btn-xs" lay-event="control">控制</button>
+				{{# } }}
+				{{#  if(d.status !== 1){ }}
+				<button class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">删除</button>
+				{{# } }}
+			</script>
+		</div>
+
+	</div>
+	<div id="ConfigDialog" style="display: none">
+	</div>
+	<div id="EditDialog" style="display: none">
+	    <div class="layui-card">
+			<div class="layui-card-body">
+			<form class="layui-form layui-form-pane layui-form-compact" lay-filter="EditDialog" action="/">
+			  <div class="layui-form-item">
+			    <label class="layui-form-label">名称</label>
+			    <div class="layui-input-block">
+			      <input type="hidden" name="id">
+			      <input type="text" name="name" placeholder="请输入" autocomplete="off" class="layui-input" lay-verify="required">
+			    </div>
+			  </div>
+			  <div class="layui-form-item">
+			    <label class="layui-form-label">产品</label>
+			    <div class="layui-input-block">
+			      <input type="hidden" name="productId">
+			      <input type="text" name="productName" placeholder="请输入" autocomplete="off" class="layui-input">
+			    </div>
+			  </div>
+			  <div class="layui-form-item">
+			    <label class="layui-form-label">序列号</label>
+			    <div class="layui-input-block">
+			      <input type="text" name="serial" placeholder="请输入" autocomplete="off" class="layui-input">
+			    </div>
+			  </div>
+			  <div class="layui-form-item">
+			    <label class="layui-form-label">Mac地址</label>
+			    <div class="layui-input-block">
+			      <input type="text" name="mac" placeholder="请输入" autocomplete="off" class="layui-input">
+			    </div>
+			  </div>
+			  <div class="layui-form-item">
+			    <label class="layui-form-label">版本号</label>
+			    <div class="layui-input-block">
+			      <input type="text" name="version" placeholder="请输入" autocomplete="off" class="layui-input">
+			    </div>
+			  </div>
+			  <div class="layui-btn-container layui-form-item">
+				<button class="layui-btn layui-btn-sm layui-btn-normal layui-btn-right" lay-submit="" lay-filter="Save">保存</button>
+			  </div>
+			</form>
+			</div>
+	    </div>
+	</div>
+	<div id="AppDialog" style="display: none; min-width:300px">
+		<table class="layui-hide" id="AppTable" lay-filter="AppTable"></table>
+		<script type="text/html" id="AppTableToolBar">
+			<form class="layui-form layui-form-pane layui-form-compact" lay-filter="AppSearchPanel" action="/">
+   				<div class="layui-inline">
+		    		<div class="layui-input-inline">
+		      			<input type="text" name="search" placeholder=""  data-url="/admin/api/app/" data-field="fullname,phone,email" class="layui-input" autocomplete="off">
+		    		</div>
+					<button class="layui-btn layui-btn-sm" lay-submit="" lay-filter="AppSearch">搜索</button>
+		  		</div>
+			</form>
+		</script>
+	</div>
+	<div id="ProductDialog" style="display: none; min-width:300px">
+		<table class="layui-hide" id="ProductTable" lay-filter="ProductTable"></table>
+		<script type="text/html" id="ProductTableToolBar">
+			<form class="layui-form layui-form-pane layui-form-compact" lay-filter="ProductSearchPanel" action="/">
+   				<div class="layui-inline">
+		    		<div class="layui-input-inline">
+		      			<input type="text" name="search" placeholder="" class="layui-input" autocomplete="off">
+		    		</div>
+					<button class="layui-btn layui-btn-sm" lay-submit="" lay-filter="ProductSearch">搜索</button>
+		  		</div>
+			</form>
+		</script>
+	</div>
+	<div id="FirmwareDialog" style="display: none; min-width:500px">
+		<table class="layui-hide" id="FirmwareTable" lay-filter="FirmwareTable"></table>
+		<script type="text/html" id="FirmwareTableToolBar">
+			<form class="layui-form layui-form-pane layui-form-compact" lay-filter="FirmwareSearchPanel" action="/">
+   				<div class="layui-inline">
+		    		<div class="layui-input-inline">
+		      			<input type="text" name="search" placeholder="" class="layui-input" autocomplete="off">
+		    		</div>
+					<button class="layui-btn layui-btn-sm" lay-submit="" lay-filter="FirmwareSearch">搜索</button>
+		  		</div>
+			</form>
+		</script>
+	</div>
+	<div id="ConfigsDialog" style="display: none; min-width:500px">
+		<table class="layui-hide" id="ConfigsTable" lay-filter="ConfigsTable"></table>
+		<script type="text/html" id="ConfigsTableToolBar">
+			<form class="layui-form layui-form-pane layui-form-compact" lay-filter="ConfigsSearchPanel" action="/">
+   				<div class="layui-inline">
+		    		<div class="layui-input-inline">
+		      			<input type="text" name="search" placeholder="" class="layui-input" autocomplete="off">
+		    		</div>
+					<button class="layui-btn layui-btn-sm" lay-submit="" lay-filter="ConfigsSearch">搜索</button>
+		  		</div>
+			</form>
+		</script>
+	</div>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/layui.js')}"></script>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/js/visit.js')}"></script>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/js/smart.js')}"></script>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/js/dict.js')}"></script>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/js/model.js')}"></script>
+<script th:inline="none">
+layui.use(['table','form','element','laydate','select'], function(){
+	var $ = layui.jquery;
+	var table = layui.table;
+	var form = layui.form;
+	var element = layui.element;
+	var laydate = layui.laydate;
+	var select = layui.select;
+	
+	var criteria = {};
+	var appCriteria = {status:1};
+	var productCriteria = {};
+	var firmwareCriteria = {};
+	var configCriteria = {};
+	
+	var mainTable,mainTableData;
+	var configDlgIdx, editDlgIdx;
+	var baseurl = '/api/account/device/';
+	var device;
+	
+	$('input[name="productName"]').on('focus', function(){
+		layer.open(productOption);
+	});
+	
+	mainTable = table.render({
+		elem: '#MainTable',
+		toolbar: '#MainTableToolBar',
+		url: baseurl,
+		where: criteria,
+		page: true,
+		height:'full-0',
+		cols: [[
+			{type:'checkbox', fixed: 'left'},
+			{field: 'id', title: 'ID'},
+			{field: 'name', title: '设备名'},
+			{field: 'appId', title: 'AppId', hide:true},
+			{field: 'appName', title: '应用'},
+			{field: 'productId', title: '产品ID', hide: true},
+			{field: 'productName', title: '产品'},
+			{field: 'deviceKey', title: 'DeviceKey'},
+			{field: 'deviceSecret', title: 'DeviceSecret', hide:true},
+			{field: 'serial', title: '序列号', hide:true},
+			{field: 'mac', title: 'Mac', hide:true},
+			{field: 'address', title: '地址'},
+			{field: 'server', title: '服务器'},
+			{field: 'version', title: '版本号'},
+			{field: 'loginTime', title: '登录时间'},
+			{field: 'createTime', title: '创建时间'},
+			{field: 'status', title: '状态', width:60, templet: function(d){
+				if(d.status == 1){
+					return '<i class="layui-icon element-icons el-icon-online" style="color:#009688;font-size:28px"></i>';
+				}else{
+					return '<i class="layui-icon element-icons el-icon-offline" style="color:#FF5722;font-size:28px"></i>';
+				}
+		      }},
+			{fixed: 'right', title:'操作', toolbar:'#MainTableRowToolBar', width:160}
+		]],
+		done: function(){
+		    select.render();
+// 		    select.render("appId",{url:"/api/account/app"});
+// 		    select.render("productId",{url:"/api/account/product"});
+            form.val('SearchPanel', criteria);
+		}
+	});
+	
+	var configOption = {
+			type: 1,
+			title: '设备配置',
+			data:{},
+			area: '500px',
+			maxWidth: 780,
+			content: $('#ConfigDialog'),
+			//btn: ['保存'],
+			yes: function(index, layero){
+				layer.msg("Save");
+				//layer.close(index);
+				var config = new Object();
+				$("#ConfigForm form").each(function(){
+					var name = $(this).attr("name");
+					if(name){
+						var group =  new Object();
+						var array = $(this).serializeArray();
+					    $.each(array, function() {
+					    	group[this.name] = this.value;
+					    });
+						config[name] = group;
+					}
+				});
+				this.data.config = JSON.stringify(config);
+				$.ajax({
+					type: "PUT",
+					url: baseurl + this.data.id,
+					data: JSON.stringify(this.data),
+					dataType: "json",
+					contentType:"application/json",
+					success: function(data) {
+						table.reload('MainTable');
+					}
+				});
+			},
+			cancel: function(index, layero){
+				layer.confirm("确认退出编辑？",function(idx){
+					layer.close(idx);
+					layer.close(index);
+				});
+				return false;
+			},
+			success: function(layero, index){
+				device = this.data;
+				if(device){
+					$.ajax({
+						type: "GET",
+						url: baseurl + device.id + "/config",
+						dataType: "json",
+						contentType:"application/json",
+						success: function(data) {
+							var config = data.data;
+							$.each(config, function(name, val) {  
+								form.val(name, val);
+							});
+							form.render();
+						}
+					});
+					//配置项表单赋值
+// 					try{
+// 						var config = JSON.parse(device.config);
+// 						$.each(config, function(name, val) {  
+// 							form.val(name, val);
+// 						});
+// 						form.render();
+// 					}catch{
+// 						if(device.config){
+// 							layer.msg("JSON 格式错误");
+// 						}
+// 						return;
+// 					}
+				}
+			}
+		}
+	
+	var editOption = {
+			type: 1,
+			title: '添加设备',
+			data:{},
+			area: '460px',
+			maxWidth: 780,
+			content: $('#EditDialog'),
+			yes: function(index, layero){
+				layer.msg("Save");
+				layer.close(index);
+			},
+			cancel: function(index, layero){
+				layer.confirm("确认退出编辑？",function(idx){
+					layer.close(idx);
+					layer.close(index);
+				});
+				return false;
+			},
+			success: function(layero, index){
+				if(this.data){
+					form.val("EditDialog",this.data);
+					$("input[name='serial']").attr("readonly", "");
+					$("input[name='version']").attr("readonly", "");
+				}else{
+					$("#EditDialog input").val("");
+					$("input[name='serial']").removeAttr("readonly");
+					$("input[name='version']").removeAttr("readonly");
+				}
+			}
+		}
+	
+	var appOption = {
+			type: 1,
+			title: '选择应用',
+			data:{},
+			maxWidth: 780,
+			content: $('#AppDialog'),
+			btn: ['选择'],
+			yes: function(index, layero){
+				layer.close(index);
+				var sel = table.checkStatus('AppTable').data[0];
+				criteria.appId = sel.id;
+				criteria.appName = sel.name;
+				if(sel){
+					form.val('SearchPanel', criteria);
+					table.reload('MainTable', {
+						page: {
+							curr: 1 //重新从第 1 页开始
+						},
+						where: criteria
+					});
+				}
+			},
+			cancel: function(index, layero){
+				layer.close(index);
+				return false;
+			},
+			success: function(layero, index){
+				appCriteria.search = $('input[name="appName"]').val();
+				table.render({
+					elem: '#AppTable',
+					toolbar: '#AppTableToolBar',
+					defaultToolbar:[],
+					url: '/api/account/app/',
+					where: appCriteria,
+					page: true,
+					cols: [[
+						{type:'radio', fixed: 'left'},
+						{field: 'name', title: '应用'}
+					]],
+					done: function(){
+						form.val('AppSearchPanel', appCriteria);
+					}
+				});
+			}
+		}
+	
+	var productOption = {
+			type: 1,
+			title: '选择应用',
+			data:{},
+			maxWidth: 780,
+			content: $('#ProductDialog'),
+			btn: ['选择'],
+			yes: function(index, layero){
+				layer.close(index);
+				var sel = table.checkStatus('ProductTable').data[0];
+				if(sel){
+					$('input[name="productId"]').val(sel.id);
+					$('input[name="productName"]').val(sel.name);
+				}
+			},
+			cancel: function(index, layero){
+				layer.close(index);
+				return false;
+			},
+			success: function(layero, index){
+				productTable = table.render({
+					elem: '#ProductTable',
+					toolbar: '#ProductTableToolBar',
+					defaultToolbar:[],
+					url: '/api/account/product/',
+					where: productCriteria,
+					page: true,
+					cols: [[
+						{type:'radio', fixed: 'left'},
+						{field: 'name', title: '产品'}
+					]],
+					done: function(){
+						form.val('ProductSearchPanel', productCriteria);
+					}
+				});
+			}
+		}
+	
+	var firmwareOption = {
+			type: 1,
+			title: '选择固件（只会对属于同一产品的设备生效）',
+			data:{},
+			maxWidth: 780,
+			content: $('#FirmwareDialog'),
+			btn: ['升级'],
+			yes: function(index, layero){
+				var sel = table.checkStatus('FirmwareTable').data[0];
+				if(sel){
+					layer.close(index);
+					var status = table.checkStatus('MainTable');
+					if(status.data.length<=0){
+						layer.msg("未选中任何设备");
+						return;
+					}
+					var devices = [];
+					status.data.forEach(function(data){
+						if(data.productId == sel.productId){
+							devices.push(data.id);
+						}
+					});
+					var msg = {};
+					msg["devices"] = devices;
+					msg["firmware"] = sel;
+					$.ajax({
+						type: "PUT",
+						url: baseurl + "upgrade",
+						data: JSON.stringify(msg),
+						dataType: "json",
+						contentType:"application/json",
+						success: function(data) {
+							layer.msg("升级命令已下发");
+						}
+					});
+				}else{
+					layer.msg("未选中任何固件");
+					return false;
+				}
+			},
+			cancel: function(index, layero){
+				layer.close(index);
+				return false;
+			},
+			success: function(layero, index){
+				firmwareTable = table.render({
+					elem: '#FirmwareTable',
+					toolbar: '#FirmwareTableToolBar',
+					defaultToolbar:[],
+					url: '/api/account/firmware/',
+					where: firmwareCriteria,
+					page: true,
+					cols: [[
+						{type:'radio', fixed: 'left'},
+						{field: 'productName', title: '产品'},
+						{field: 'name', title: '固件名'},
+						{field: 'version', title: '版本号'}
+					]],
+					done: function(){
+						form.val('FirmwareSearchPanel', firmwareCriteria);
+					}
+				});
+			}
+		}
+	
+	var configsOption = {
+			type: 1,
+			title: '选择配置（只会对属于同一产品的设备生效）',
+			data:{},
+			maxWidth: 780,
+			content: $('#ConfigsDialog'),
+			btn: ['升级'],
+			yes: function(index, layero){
+				var sel = table.checkStatus('ConfigsTable').data[0];
+				if(sel){
+					layer.close(index);
+					var status = table.checkStatus('MainTable');
+					if(status.data.length<=0){
+						layer.msg("未选中任何设备");
+						return;
+					}
+					var devices = [];
+					status.data.forEach(function(data){
+						if(data.productId == sel.productId){
+							devices.push(data.id);
+						}
+					});
+					var msg = {};
+					msg["devices"] = devices;
+			 		try{
+			 			var config = JSON.parse(sel.config);
+						msg["config"] = config;
+			 		}catch{
+			 			layer.open({
+			 				title:"错误",
+			 				content:"配置格式错误",
+			 			});
+			 			return;
+			 		}
+					$.ajax({
+						type: "PUT",
+						url: baseurl + "config",
+						data: JSON.stringify(msg),
+						dataType: "json",
+						contentType:"application/json",
+						success: function(data) {
+							layer.msg("升级命令已下发");
+						}
+					});
+				}else{
+					layer.msg("未选中任何固件");
+					return false;
+				}
+			},
+			cancel: function(index, layero){
+				layer.close(index);
+				return false;
+			},
+			success: function(layero, index){
+				firmwareTable = table.render({
+					elem: '#ConfigsTable',
+					toolbar: '#ConfigsTableToolBar',
+					defaultToolbar:[],
+					url: '/api/account/config/',
+					where: configCriteria,
+					page: true,
+					cols: [[
+						{type:'radio', fixed: 'left'},
+						{field: 'productName', title: '产品'},
+						{field: 'name', title: '配置名'},
+						{field: 'tag', title: '标签'}
+					]],
+					done: function(){
+						form.val('ConfigsSearchPanel', configCriteria);
+					}
+				});
+			}
+		}
+	
+	//监听搜索应用表单提交
+	form.on('submit(AppSearch)', function(data){
+		appCriteria.search = data.field.search;
+		table.reload('AppTable',{
+			page: {
+				curr: 1 //重新从第 1 页开始
+			},
+			where: appCriteria
+		});
+		return false;
+	});
+	
+	//监听搜索产品表单提交
+	form.on('submit(ProductSearch)', function(data){
+		productCriteria.search = data.field.search;
+		table.reload('ProductTable',{
+			page: {
+				curr: 1 //重新从第 1 页开始
+			},
+			where: productCriteria
+		});
+		return false;
+	});
+	
+	//监听搜索产品表单提交
+	form.on('submit(FirmwareSearch)', function(data){
+		firmwareCriteria.search = data.field.search;
+		table.reload('FirmwareTable',{
+			page: {
+				curr: 1 //重新从第 1 页开始
+			},
+			where: firmwareCriteria
+		});
+		return false;
+	});
+	
+	//监听搜索产品表单提交
+	form.on('submit(ConfigsSearch)', function(data){
+		configCriteria.search = data.field.search;
+		table.reload('ConfigsTable',{
+			page: {
+				curr: 1 //重新从第 1 页开始
+			},
+			where: configCriteria
+		});
+		return false;
+	});
+	
+	//监听配置表单提交
+	form.on('submit(Config)', function(data){
+		var config = {};
+// 		try{
+// 			config = JSON.parse(device.config);
+// 		}catch{
+// 		}
+// 		config[data.form.name] = data.field;
+		config[data.form.name] = data.field;
+		device.config = JSON.stringify(config);
+		$.ajax({
+			type: "PUT",
+			url: baseurl + device.id + "/config",
+			data: JSON.stringify(config),
+			dataType: "json",
+			contentType:"application/json",
+			success: function(data) {
+				//table.reload('MainTable');
+				layer.msg("配置消息已下发");
+			}
+		});
+		return false;
+	});
+	
+	//监听搜索表单提交
+	form.on('submit(Search)', function(data){
+		criteria = data.field;
+		table.reload('MainTable', {
+			page: {
+				curr: 1 //重新从第 1 页开始
+			},
+			where: criteria
+		});
+		return false;
+	});
+	  
+	//监听表单提交
+	form.on('submit(Save)', function(data){
+		layer.close(editDlgIdx);
+		var entity = data.field;
+		if(entity.id > 0){
+			$.ajax({
+				type: "PUT",
+				url: baseurl + entity.id,
+				data: JSON.stringify(entity),
+				dataType: "json",
+				contentType:"application/json",
+				success: function(data) {
+					table.reload('MainTable');
+				}
+			});
+		}else{
+			entity.appId = criteria.appId;
+			$.ajax({
+				type: "POST",
+				url: baseurl,
+				data: JSON.stringify(entity),
+				dataType: "json",
+				contentType:"application/json",
+				success: function(data) {
+					table.reload('MainTable', {
+						page: {
+							curr: 1 //重新从第 1 页开始
+						}
+					});
+				}
+			});
+		}
+		return false;
+	});
+
+	//Table工具栏事件
+	table.on('toolbar(MainTable)', function(obj){
+		switch(obj.event){
+		case 'add':
+			if(criteria.appId > 0){
+				editOption.title = '添加设备';
+				editOption.data = null;
+				editDlgIdx = layer.open(editOption);
+			}else{
+				layer.alert("请选择所属应用", {icon: 5, title:'错误'});
+			}
+			break;
+		case 'delete':
+			var status = table.checkStatus('MainTable');
+			if(status.data.length<=0){
+				layer.msg("未选中任何设备");
+				break;
+			}
+			layer.confirm('确认删除所选设备？', {icon: 2, title:'删除'}, function(index){
+				layer.close(index);
+				status.data.forEach(function(data){
+					$.ajax({
+						type: "DELETE",
+						url: baseurl + data.id,
+						success: function(data) {
+							table.reload('MainTable');
+						}
+					});
+				});
+			});
+			break;
+		case 'upgrade':
+			var status = table.checkStatus('MainTable');
+			if(status.data.length<=0){
+				layer.msg("未选中任何设备");
+				break;
+			}
+			layer.open(firmwareOption);
+			break;
+		case 'config':
+			var status = table.checkStatus('MainTable');
+			if(status.data.length<=0){
+				layer.msg("未选中任何设备");
+				break;
+			}
+			layer.open(configsOption);
+			break;
+		case 'chooseApp':
+			layer.open(appOption);
+			break;
+		};
+	});//监听行工具事件
+	table.on('tool(MainTable)', function(obj){
+		switch(obj.event){
+		case 'control':
+			parent.addTab("device" + obj.data.id, "设备控制-" + obj.data.name, "/device/face-record?id=" + obj.data.id);
+			break;
+		case 'config':
+			$.ajax({
+				type: "GET",
+				url: '/api/account/product/' + obj.data.productId,
+				dataType: "json",
+				contentType:"application/json",
+				success: function(data) {
+					//构建配置界面
+					try{
+						var model = JSON.parse(data.data.config);
+						buildConfigUI($('#ConfigDialog'), model, true);
+						configOption.data = obj.data;
+						configOption.model = obj.data;
+						configDlgIdx = layer.open(configOption);
+					}catch{
+						layer.open({
+							  title: '错误'
+							  ,icon: 2
+							  ,content: '设备配置模型加载失败！'
+							});
+						return;
+					}
+				},
+				error: function(){
+					layer.open({
+						  title: '错误'
+						  ,icon: 2
+						  ,content: '设备配置模型加载失败！'
+						});
+				}
+			});
+			break;
+		case 'modify':
+			editOption.title = '编辑设备';
+			editOption.data = obj.data;
+			editDlgIdx = layer.open(editOption);
+			break;
+		case 'delete':
+			layer.confirm('确认删除设备：'+obj.data.name, {icon: 2, title:'删除'}, function(index){
+				layer.close(index);
+				$.ajax({
+					type: "DELETE",
+					url: baseurl+obj.data.id,
+					success: function(data) {
+						obj.del();
+					}
+				});
+			});
+			break;
+		};
+	});
+});
+</script>
+</body>
+</html>

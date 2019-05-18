@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" th:with="system=${@systemConfig}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="">
+<meta name="author" content="">
+<title th:text="${'Login - ' + system?.title}"></title>
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/css/layui.css')}">
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/css/login.css')}">
+</head>
+<body class="layui-layout-body">
+<div class="layui-layout">
+	<div id="loginWraper">
+		<div id="login">
+			<div><h1 style="font-weight:bold;color:#009688;padding:15px 0;" th:text="${system?.title}"></h1></div>
+			<form class="layui-form layui-form-pane" method="post" action="/login" style="padding-top: 25px;">
+			  <div class="layui-form-item">
+			    <label class="layui-form-label layui-icon layui-icon-username login-label"></label>
+			    <div class="layui-input-inline login-input">
+			      <input type="text" name="username" required  lay-verify="required" placeholder="Enter Username" autocomplete="off" class="layui-input">
+			    </div>
+			  </div>
+			  <div class="layui-form-item">
+			    <label class="layui-form-label layui-icon layui-icon-password login-label"></label>
+			    <div class="layui-input-inline login-input">
+			      <input type="password" name="password" required lay-verify="required" placeholder="Enter Passsword" autocomplete="off" class="layui-input">
+			    </div>
+			  </div>
+			  <div class="layui-form-item">
+			    <div class="layui-input-inline">
+				  <input type="checkbox" name="remenber" title="Remember me" lay-skin="primary" checked>
+			    </div>
+			    <div class="layui-input-block">
+			      <button class="layui-btn" lay-submit lay-filter="Signin">登录</button>
+			    </div>
+			  </div>
+			  <div class="layui-form-item" style="margin-bottom: 0px;">
+			    <span style="float:left;margin-left:20px;"><a href="/register">没有账号？注册</a></span>
+			    <span style="float:right;margin-right:40px;"><a href="/register">忘记密码？</a></span>
+			  </div>
+			</form>
+		</div>
+	</div>
+</div>
+<div class="beian">
+	<a href="http://www.miitbeian.gov.cn" target="_blank" th:text="${system?.beian}"></a>
+</div>
+<script type="text/javascript">
+	if (self!=top){
+		window.top.location.replace(self.location);
+	}
+</script>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/layui.js')}"></script>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/js/visit.js')}"></script>
+<script>
+//JavaScript代码区域
+layui.use(['element', 'form', 'layer'], function(){
+	var $ = layui.jquery;
+	var element = layui.element;
+	var form = layui.form;
+	var layer = layui.layer;
+
+	//*
+	form.on('submit(Signin)', function(data){
+		var user = data.field;
+		$.ajax({
+			type: "POST",
+			url: '/login',
+			data: user,
+			success: function(result) {
+				window.location = "/";
+			},
+			error: function(result){
+				layer.msg("登陆失败，用户名或密码错误");
+			}
+		});
+		return false;
+	});
+	//*/
+  
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,366 @@
+html,body{
+	width:100%;
+	height:100%;
+	padding:0px;
+	margin:0px;
+}
+
+.layui-nav-item span.layui-icon{
+	position: absolute;
+    font-size: 20px;
+}
+
+.layui-nav-item span.nav-title{
+	padding-left:28px;
+}
+
+.smart-tab{
+	position: absolute;
+	margin:0px;
+    width: 100%;
+    height: 100%;
+}
+.smart-tab .layui-tab-content{
+	position: absolute;
+    left: 0;
+    top: 40px;
+    right: 0;
+    bottom: 0;
+}
+
+.smart-tab .layui-tab-item{
+	position: absolute;
+    left: 10px;
+    top: 10px;
+    right: 10px;
+    bottom: 10px;
+}
+
+#maintab.layui-tab-title li:first-child{
+    min-width: 0;
+    font-weight:bold;
+}
+
+#maintab.layui-tab-title li:first-child .layui-tab-close{
+    display: none;
+}
+
+#maintab.layui-tab-title li.layui-this{
+	background-color: #f6f6f6;
+}
+
+.content-iframe{
+	position: relative;
+	width:100%;
+	height:100%;
+}
+
+.content-wrapper{
+	position:relative;
+	width:100%;
+	height:100%;
+	float: left;
+}
+
+.content-main{
+	position:relative;
+	right: 0px;
+	height:100%;
+}
+
+.content-tree{
+	float: left;
+	margin-right: 10px;
+	padding: 10px 0px;
+	border-width: 1px;
+    border-style: solid;
+    border-color: #e6e6e6;
+}
+
+.content-table{
+	position:absolute;
+	left: 272px;
+	right: 0px;
+}
+
+.content-widget{
+	box-sizing: border-box;
+	display: inline-block;
+	padding: 5px;
+	position:relative;
+	width:100%;
+	min-height: 300px;
+	border: 1px solid #e6e6e6;
+	margin-bottom: 10px;
+}
+
+.access-widget{
+	float:left;
+	width:240px;
+	height:300px;
+	margin:0px 5px;
+	border: 1px solid #e6e6e6;
+}
+
+.face-widget{
+	float:left;
+	width:240px;
+	height:300px;
+	margin:0px 5px;
+	border: 1px solid #e6e6e6;
+}
+
+.access-widget .widget-image-wrapper{
+	height:180px;
+}
+
+.face-widget .widget-image-wrapper{
+	height:150px;
+}
+
+.access-widget .widget-image{
+	margin:3px auto;
+    width: 150px;  
+    height: 170px;
+}
+
+.face-widget .widget-image{
+	margin:10px 5px;
+    width: 110px;  
+    height: 130px;
+    float:left;
+}
+
+.widget-image img{  
+    width: auto;  
+    height: auto;  
+    max-width: 100%;  
+    max-height: 100%;     
+}
+
+.access-widget .widget-prop-wrapper{
+	height:120px;
+}
+
+.face-widget .widget-prop-wrapper{
+	height:150px;
+}
+
+.widget-prop{
+	line-height:28px;
+	font-size:12px;
+}
+
+.widget-prop-label{
+	box-sizing: border-box;
+	width:100px;
+	padding-right: 4px;
+	text-align: right;
+    vertical-align: middle;
+    float: left;
+    font-size: 14px;
+    color: #606266;
+}
+
+.widget-prop-value{
+	min-width: 100px;
+    max-width: 140px;
+	text-align: left;
+    vertical-align: middle;
+    float: left;
+    font-size: 14px;
+    font-weight:bold;
+    white-space:nowrap;
+	text-overflow:ellipsis;
+	overflow:hidden;
+}
+
+.content-main .layui-table, .layui-table-view {
+    margin: 0px;
+}
+
+.content-table .layui-table, .layui-table-view {
+    margin: 0px;
+}
+
+.layui-layer-page .layui-layer-content{
+	overflow: visible!important;
+}
+
+.layui-table-cell{
+	text-align: center;
+}
+
+.layui-form-compact .layui-form-item {
+    margin-bottom: 10px;
+}
+.layui-form-compact .layui-form-label{
+	width: 80px;
+	padding: 5px 5px;
+	height: 32px;
+}
+.layui-form-compact .layui-form-item .layui-input-block{
+	margin-left: 80px;
+    min-height: 32px;
+}
+.layui-form-compact .layui-form-item .layui-input-inline{
+	width: 160px;
+}
+.layui-form-compact .layui-form-item .layui-form-mid{
+	padding: 8px 0!important;
+    line-height: 16px;
+}
+.layui-form-compact .layui-input{
+	height: 32px;
+}
+.layui-form-compact .layui-inline{
+	margin-bottom: 0px;
+}
+.layui-form-compact .layui-btn-container{
+    margin-top: 10px;
+    margin-bottom: 0px;
+}
+.layui-form-compact .layui-btn-container .layui-btn{
+    margin-bottom: 0px;
+}
+.layui-form-compact .layui-inline{
+    margin-right: 5px;
+}
+.layui-form-compact .layui-input-inline{
+    margin-right: 5px;
+}
+.layui-inline-last{
+    margin-right: 0px!important;
+}
+.layui-inline-last .layui-input-inline{
+    margin-right: 0px;
+}
+.layui-btn-right{
+    float:right;
+}
+.layui-table-tool .layui-form-item{
+	margin-bottom: 0px;
+}
+.layui-table-tool .layui-form-label{
+	background-color: #009688;
+	color: #fff;
+}
+.layui-table-tool .layui-inline{
+	margin-bottom: 0px;
+}
+.layui-table-tool .layui-input{
+	height: 32px;
+}
+.layui-table-tool .layui-btn {
+    margin-bottom: 0px;
+}
+
+.smart-search-select{
+	margin-top: 2px;
+	display:none;
+	position:absolute;
+	height:100px;
+	z-index:100;
+	background-color: #fff;
+	border:1px solid #e6e6e6;
+}
+.smart-search-select li{
+	padding: 0px 10px;
+	cursor: pointer;
+	min-width:160px;
+	height:30px;
+	line-height:30px;
+	white-space:nowrap;  
+}
+.smart-check-list{
+	min-height: 36px;
+}
+.smart-search-select li span{
+	padding: 0px 2px;
+}
+.smart-search-select li:hover{
+	background-color:#e6e6e6;
+}
+
+#Portrait{
+	position:absolute;
+	top:10px;
+	right:25px;
+	width:210px;
+	height:240px;
+}
+
+.smart-image-select img{
+	position:absolute;
+	width:100%;
+	height:100%;
+}
+
+.smart-image-select input{
+	position:absolute;
+	width:100%;
+	height:100%;
+	opacity:0;
+}
+
+.smart-image-table .layui-table-cell{
+	height: auto;
+	padding: 0 4px;
+}
+.smart-image-table .layui-cell-image{
+	margin:auto;
+	height: 80px;
+	width: 70px;
+}
+.smart-image-table .layui-cell-image img{
+	align-items: center;
+    width: auto;  
+    height: auto;  
+    max-width: 100%;  
+    max-height: 100%;  
+}
+.smart-image-layer{
+	margin:auto;
+	min-height: 200px;
+	min-width: 200px;
+	max-height: 400px;
+	max-width: 400px;
+}
+.smart-image-layer img{
+    width: auto;  
+    height: auto;  
+    max-width: 100%;  
+    max-height: 100%;  
+}
+.system-config .layui-collapse{
+	margin-bottom: 20px;
+}
+.system-config .layui-form-label{
+    width: 160px;
+}
+.system-config .layui-input-inline{
+    width: 300px;
+}
+
+.content-list{
+	float:left;
+	border:1px solid #e6e6e6;
+}
+li.dict-list-item{
+	height:50px;
+	width:260px;
+	line-height:50px;
+	font-size:16px;
+	padding-left:30px;
+	box-sizing: border-box;
+}
+li.dict-list-item:nth-child(odd){
+	background-color:#f2f2f2;
+}
+li.dict-list-item:hover{
+	background-color:#e6e6e6;
+}
+li.dict-list-current{
+	color: #ffffff;
+	background-color:#aba5a5!important;;
+}

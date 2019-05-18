@@ -1,0 +1,47 @@
+html{
+	height: 100%;
+}
+
+body{
+	background-image: url(../background.png);
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+	-moz-background-size: 100% 100%;
+}
+
+#loginWraper{
+	text-align:center;
+	margin:0 auto;
+	margin-top: 200px;
+	width: 502px;
+}
+
+#login{
+	padding: 70px 80px 40px;
+	border-radius: 5px;
+	border: 1px solid #e6e6e6;
+	background: #ffffff;
+}
+
+.layui-form-pane .login-label{
+	width: 50px;
+}
+
+.layui-form-item {
+    margin-bottom: 20px;
+}
+
+.layui-form-item .login-input{
+	width: 280px;
+}
+
+.beian{
+	position:absolute;
+	right:0px;
+	bottom:0px;
+	margin-right:10px;
+	margin-bottom:3px;
+}
+.beian a{
+	color:#ccc;
+}

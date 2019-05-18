@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title></title>
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/css/layui.css')}">
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/ext/dtree/dtree.css')}">
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/ext/dtree/font/iconfont.css')}">
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/font/iconfont.css')}">
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/css/index.css')}">
+</head>
+<body class="layui-layout-body">
+
+	<div class="content-wrapper">
+		
+		<div class="content-main">
+			<table class="layui-hide" id="MainTable" lay-filter="MainTable"></table>
+			<script type="text/html" id="MainTableToolBar">
+				<form class="layui-form layui-form-pane layui-form-compact" lay-filter="SearchPanel" action="/">
+   					<div class="layui-inline">
+		    			<div class="layui-input-inline">
+		      				<input type="text" name="search" placeholder="应用名"  class="layui-input" autocomplete="off">
+		    			</div>
+						<button class="layui-btn layui-btn-sm" lay-submit="" lay-filter="Search">搜索</button>
+		  			</div>
+    				<div class="layui-inline">
+						<button type="button" class="layui-btn layui-btn-sm" lay-event="add">添加</button>
+						<button type="button" class="layui-btn layui-btn-sm" lay-event="delete">删除</button>
+			  		</div>
+				</form>
+			</script>
+			<script type="text/html" id="MainTableRowToolBar">
+				<button class="layui-btn layui-btn-xs" lay-event="config">配置</button>
+				<button class="layui-btn layui-btn-xs layui-btn-normal" lay-event="modify">修改</button>
+				<button class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">删除</button>
+			</script>
+		</div>
+
+	</div>
+	<div id="EditDialog" style="display: none">
+	    <div class="layui-card">
+			<div class="layui-card-body">
+			<form class="layui-form layui-form-pane layui-form-compact" lay-filter="EditDialog" action="/">
+			  <div class="layui-form-item">
+			    <label class="layui-form-label">名称</label>
+			    <div class="layui-input-block">
+			      <input type="hidden" name="id">
+			      <input type="text" name="name" placeholder="请输入" autocomplete="off" class="layui-input" lay-verify="required">
+			    </div>
+			  </div>
+			  <div class="layui-btn-container layui-form-item">
+				<button class="layui-btn layui-btn-sm layui-btn-normal layui-btn-right" lay-submit="" lay-filter="Save">保存</button>
+				<button class="layui-btn layui-btn-sm layui-btn-primary layui-btn-right">重置</button>
+			  </div>
+			</form>
+			</div>
+	    </div>
+	</div>
+	<div id="ConfigDialog" style="display: none">
+	    <div class="layui-card">
+			<div class="layui-card-body">
+			<form class="layui-form layui-form-compact" lay-filter="ConfigDialog" action="/">
+			  <input type="hidden" name="id">
+			  <div class="layui-form-item">
+			    <label class="layui-form-label"></label>
+			    <div class="layui-input-block">
+			      <input type="checkbox" lay-filter="reglimited" name="reglimited" lay-skin="primary" title="只允许已添加或已导入的设备注册">
+			    </div>
+			  </div>
+			  <div class="layui-form-item">
+			    <label class="layui-form-label">设备标志：</label>
+			    <div class="layui-input-block">
+			      <input type="radio" lay-filter="identity" name="identity" value="serial" title="序列号" checked>
+			      <input type="radio" lay-filter="identity" name="identity" value="mac" title="Mac地址">
+			      <input type="radio" lay-filter="identity" name="identity" value="none" title="无">
+			    </div>
+			  </div>
+			  <div class="layui-btn-container layui-form-item">
+				<button class="layui-btn layui-btn-sm layui-btn-normal layui-btn-right" lay-submit="" lay-filter="SaveConfig">保存</button>
+				<button class="layui-btn layui-btn-sm layui-btn-primary layui-btn-right">重置</button>
+			  </div>
+			</form>
+			</div>
+	    </div>
+	</div>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/layui.js')}"></script>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/js/visit.js')}"></script>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/js/smart.js')}"></script>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/js/dict.js')}"></script>
+<script th:inline="none">
+layui.use(['table','form'], function(){
+	var $ = layui.jquery;
+	var table = layui.table;
+	var form = layui.form;
+	
+	var criteria = {};
+	
+	var mainTable;
+	var mainTableData;
+	var editDlgIdx;
+	var configDlgIdx;
+	var baseurl = '/api/account/app/';
+	
+	mainTable = table.render({
+		elem: '#MainTable',
+		toolbar: '#MainTableToolBar',
+		url: baseurl,
+		where: criteria,
+		page: true,
+		height:'full-0',
+		cols: [[
+			{type:'checkbox', fixed: 'left'},
+			{field: 'id', title: 'ID'},
+			{field: 'name', title: '名称'},
+			{field: 'appKey', title: 'AppKey'},
+			{field: 'appSecret', title: 'AppSecret', hide:true},
+			{field: 'createTime', title: '创建时间'},
+			{field: 'updateTime', title: '修改时间'},
+			{field: 'status', title: '状态', width:60, templet: function(d){
+				switch(d.status){
+				case 0:
+					return '<i class="layui-icon element-icons el-icon-unverified" style="color:#1296db;font-size:28px"></i>';
+				case 1:
+					return '<i class="layui-icon element-icons el-icon-normal" style="color:#2aa515;font-size:28px"></i>';
+				case 2:
+					return '<i class="layui-icon element-icons el-icon-forbid" style="color:#d81e06;font-size:28px"></i>';
+				case 3:
+					return '<i class="layui-icon element-icons el-icon-delete" style="color:#d81e06;font-size:28px"></i>';
+				}
+		      }},
+			{fixed: 'right', title:'操作', toolbar:'#MainTableRowToolBar', width:160}
+		]],
+		done: function(){
+			form.val('SearchPanel', criteria);
+		}
+	});
+	
+	var editOption = {
+			type: 1,
+			title: '添加应用',
+			data:{},
+			maxWidth: 780,
+			content: $('#EditDialog'),
+			yes: function(index, layero){
+				layer.msg("Save");
+				layer.close(index);
+			},
+			cancel: function(index, layero){
+				layer.confirm("确认退出编辑？",function(idx){
+					layer.close(idx);
+					layer.close(index);
+				});
+				return false;
+			},
+			success: function(layero, index){
+				if(this.data){
+					form.val("EditDialog",this.data);
+				}else{
+					$("#EditDialog input").val("");
+				}
+			}
+		}
+	
+	var configOption = {
+			type: 1,
+			title: '应用设置',
+			data:{},
+			maxWidth: 780,
+			content: $('#ConfigDialog'),
+			yes: function(index, layero){
+				layer.msg("Save");
+				layer.close(index);
+			},
+			success: function(layero, index){
+				var field = {reglimited:true, identity: "serial"};
+				field.id = configOption.data.id;
+				$.ajax({
+					type: "GET",
+					url: baseurl + field.id + "/config",
+					dataType: "json",
+					contentType:"application/json",
+					success: function(data) {
+						if(data.code == 0){
+							if(data.data != null){
+								field = data.data;
+								field.id = configOption.data.id;
+							}
+							form.val("ConfigDialog",field);
+							if(field.reglimited){
+								$("input[value='none']").attr("disabled", true);
+							}else{
+								$("input[value='none']").removeAttr("disabled");
+							}
+							form.render('radio');
+							form.render('checkbox');
+						}else{
+							log.msg("获取应用配置失败：" + data.desc);
+						}
+					}
+				});
+			}
+		}
+	
+	form.on('checkbox(reglimited)', function(data){
+		if(data.elem.checked){
+			$("input[value='none']").attr("disabled", true);
+		}else{
+			$("input[value='none']").removeAttr("disabled");
+		}
+		form.render('radio');
+	});
+	
+	form.on('radio(identity)', function(data){
+	});    
+	
+	//监听应用设置表单提交
+	form.on('submit(SaveConfig)', function(data){
+		var field = data.field;
+		if(field.reglimited == "on" && field.identity == "none"){
+			layer.msg("必须指定设备标志");
+			return false;
+		}
+		if(field.reglimited == "on"){
+			field.reglimited = true;
+		}else{
+			field.reglimited = false;
+		}
+		layer.close(configDlgIdx);
+		$.ajax({
+			type: "PUT",
+			url: baseurl + field.id + "/config",
+			data: JSON.stringify(field),
+			dataType: "json",
+			contentType:"application/json",
+			success: function(data) {
+				layer.msg("设置成功");
+			}
+		});
+		return false;
+	});  
+	
+	//监听搜索表单提交
+	form.on('submit(Search)', function(data){
+		criteria.search = data.field.search;
+		table.reload('MainTable', {
+			page: {
+				curr: 1 //重新从第 1 页开始
+			},
+			where: criteria
+		});
+		return false;
+	});
+	  
+	//监听表单提交
+	form.on('submit(Save)', function(data){
+		layer.close(editDlgIdx);
+		var entity = data.field;
+		if(entity.id > 0){
+			$.ajax({
+				type: "PUT",
+				url: baseurl + entity.id,
+				data: JSON.stringify(entity),
+				dataType: "json",
+				contentType:"application/json",
+				success: function(data) {
+					table.reload('MainTable');
+				}
+			});
+		}else{
+			$.ajax({
+				type: "POST",
+				url: baseurl,
+				data: JSON.stringify(entity),
+				dataType: "json",
+				contentType:"application/json",
+				success: function(data) {
+					table.reload('MainTable', {
+						page: {
+							curr: 1 //重新从第 1 页开始
+						}
+					});
+				}
+			});
+		}
+		return false;
+	});
+
+	//Table工具栏事件
+	table.on('toolbar(MainTable)', function(obj){
+		switch(obj.event){
+			case 'add':
+				editOption.title = '添加应用';
+				editOption.data = null;
+				editDlgIdx = layer.open(editOption);
+				break;
+			case 'delete':
+				var status = table.checkStatus('MainTable');
+				if(status.data.length<=0){
+					layer.msg("未选中任何应用");
+					break;
+				}
+				layer.confirm('确认删除所选应用？', {icon: 2, title:'删除'}, function(index){
+					layer.close(index);
+					status.data.forEach(function(data){
+						$.ajax({
+							type: "DELETE",
+							url: baseurl + data.id,
+							success: function(data) {
+								table.reload('MainTable');
+							}
+						});
+					});
+				});
+				break;
+		};
+	});//监听行工具事件
+	table.on('tool(MainTable)', function(obj){
+		switch(obj.event){
+		case 'config':
+			configOption.data = obj.data;
+			configDlgIdx = layer.open(configOption);
+			break;
+		case 'modify':
+			editOption.title = '编辑应用';
+			editOption.data = obj.data;
+			editDlgIdx = layer.open(editOption);
+			break;
+		case 'delete':
+			layer.confirm('确认删除应用：'+obj.data.name, {icon: 2, title:'删除'}, function(index){
+				layer.close(index);
+				$.ajax({
+					type: "DELETE",
+					url: baseurl+obj.data.id,
+					success: function(data) {
+						obj.del();
+					}
+				});
+			});
+			break;
+		};
+	});
+});
+</script>
+</body>
+</html>

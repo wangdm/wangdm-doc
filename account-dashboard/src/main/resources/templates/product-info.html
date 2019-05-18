@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title></title>
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/css/layui.css')}">
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/ext/dtree/dtree.css')}">
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/ext/dtree/font/iconfont.css')}">
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/font/iconfont.css')}">
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/css/index.css')}">
+</head>
+<body class="layui-layout-body">
+
+	<div class="content-wrapper">
+		
+		<div class="content-main">
+			<div class="layui-tab layui-tab-brief" lay-filter="ProductTab" style="height: 100%;">
+				<ul class="layui-tab-title">
+					<li class="layui-this">产品信息</li>
+					<li>设备模型</li>
+					<li>配置模型</li>
+					<li>预设配置</li>
+				</ul>
+				<div class="layui-tab-content" style="background-color: #eee;height: calc(100% - 60px);">
+					<div class="layui-tab-item layui-show">
+					</div>
+					<div class="layui-tab-item" style="height: calc(100% - 20px);">
+						<div class="layui-card">
+							<div class="layui-card-body">
+								<div>
+								  <button class="layui-btn" id="EditModelBtn">编辑</button>
+								  <button class="layui-btn" id="SaveModelBtn" style="display:none">保存</button>
+								</div>
+							</div>
+						</div>
+						<div id="ViewModel">
+							<div class="layui-card">
+								<div class="layui-card-header">属性</div>
+								<div class="layui-card-body">
+								</div>
+							</div>
+							<div class="layui-card">
+								<div class="layui-card-header">事件</div>
+								<div class="layui-card-body">
+								</div>
+							</div>
+							<div class="layui-card">
+								<div class="layui-card-header">服务</div>
+								<div class="layui-card-body">
+								</div>
+							</div>
+						</div>
+						<div id="EditModel" style="display:none;height:calc(100% - 70px);">
+							<textarea name="model" class="layui-textarea" style="font-family: Consolas;height:100%;"></textarea>
+						</div>
+					</div>
+					<div class="layui-tab-item" style="height: calc(100% - 20px);">
+						<div class="layui-card">
+							<div class="layui-card-body">
+								<div>
+								  <button class="layui-btn" id="EditConfigBtn">编辑</button>
+								  <button class="layui-btn" id="SaveConfigBtn" style="display:none">保存</button>
+								  <button class="layui-btn" id="ViewConfigBtn">预览</button>
+								</div>
+							</div>
+						</div>
+						<div id="ViewConfig">
+							<pre class="layui-code">
+							</pre>
+						</div>
+						<div id="EditConfig" style="display:none;height: calc(100% - 70px);" >
+							<textarea name="config" maxlength="4000" class="layui-textarea" style="font-family: Consolas;height:100%;"></textarea>
+						</div>
+					</div>
+					<div class="layui-tab-item" style="height: calc(100% - 20px);">
+						<table class="layui-hide" id="ConfigTable" lay-filter="ConfigTable"></table>
+						<script type="text/html" id="ConfigTableToolBar">
+						<form class="layui-form layui-form-pane layui-form-compact" lay-filter="SearchPanel" action="/">
+   							<div class="layui-inline">
+		   		 				<div class="layui-input-inline">
+		    		  				<input type="text" name="search" placeholder="固件名"  class="layui-input" autocomplete="off">
+		    					</div>
+								<button class="layui-btn layui-btn-sm" lay-submit="" lay-filter="Search">搜索</button>
+		  					</div>
+    						<div class="layui-inline">
+								<button type="button" class="layui-btn layui-btn-sm" lay-event="add">添加</button>
+								<button type="button" class="layui-btn layui-btn-sm" lay-event="delete">删除</button>
+			  				</div>
+						</form>
+						</script>
+						<script type="text/html" id="ConfigTableRowToolBar">
+						<button class="layui-btn layui-btn-xs layui-btn-normal" lay-event="modify">修改</button>
+						<button class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">删除</button>
+						</script>
+					</div>
+				</div>
+			</div> 
+		</div>
+
+	</div>
+	<div id="ConfigDialog" style="display: none">
+		<div class="layui-card" style="margin-bottom: 0px;">
+			<div class="layui-card-body">
+				<form class="layui-form layui-form-pane layui-form-compact" id="ProductConfig" lay-filter="ProductConfig" action="/">
+					<div class="layui-form-item">
+						<label class="layui-form-label">配置名</label>
+				 		<div class="layui-input-inline">
+							<input type="hidden" name="id">
+							<input type="text" name="name" placeholder="请输入" autocomplete="off" class="layui-input" lay-verify="required">
+						</div>
+					</div>
+					<div class="layui-form-item" style="margin-bottom: 0px">
+						<label class="layui-form-label">标签</label>
+						<div class="layui-input-block">
+							<input type="text" name="tag" placeholder="请输入" autocomplete="off" class="layui-input">
+				 		</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	    <div class="layui-card" style="margin-bottom: 0px;box-shadow:0 0 0 0">
+			<div class="layui-card-body" style="padding-bottom: 0px;" id="ConfigTab">
+			</div>
+	    </div>
+	</div>
+	<div id="ViewConfigDialog" style="display: none;padding:0px 20px">
+	</div>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/layui.js')}"></script>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/js/visit.js')}"></script>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/js/smart.js')}"></script>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/js/dict.js')}"></script>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/js/model.js')}"></script>
+<script th:inline="none">
+layui.use(['table','form','element','code'], function(){
+	var $ = layui.jquery;
+	var table = layui.table;
+	var form = layui.form;
+	var element = layui.element;
+	
+	var criteria = {};
+	
+	var configTable;
+	var configTableData;
+	var editDlgIdx;
+	var entity;
+	var baseurl = '/api/account/product/';
+	var configurl = '/api/account/config/';
+	
+	var params = getParams(window.location.href);
+	criteria.productId = params["id"];
+	
+	$.ajax({
+		type: "GET",
+		url: baseurl + params["id"],
+		dataType: "json",
+		contentType:"application/json",
+		success: function(data) {
+			entity = data.data;
+			$('textarea[name="model"]').val(entity.model);
+			$('textarea[name="config"]').val(entity.config);
+			$('.layui-code').text(entity.config);
+			layui.code({
+				title: 'JSON',
+				height: '600px',
+				//,skin: 'notepad'
+				about: false
+			});
+		}
+	});
+	
+	element.init();
+	element.on('tab', function(data){
+	});
+
+	$('#SaveModelBtn').on('click', function(){
+		var str = entity.model = $('textarea[name="model"]').val();
+		try{
+			var obj = JSON.parse(str);
+		}catch{
+			layer.msg("JSON 格式错误");
+			return;
+		}
+
+		entity.model = str;
+		$.ajax({
+			type: "PUT",
+			url: baseurl + entity.id,
+			data: JSON.stringify(entity),
+			dataType: "json",
+			contentType:"application/json",
+			success: function(data) {
+			}
+		});
+		
+		$('#SaveModelBtn').hide();
+		$('#EditModel').hide();
+		$('#EditModelBtn').show();
+		$('#ViewModel').show();
+	});
+
+	$('#EditModelBtn').on('click', function(){
+		$('#EditModelBtn').hide();
+		$('#ViewModel').hide();
+		$('#SaveModelBtn').show();
+		$('#EditModel').show();
+	});
+
+	$('#SaveConfigBtn').on('click', function(){
+		var str = entity.config = $('textarea[name="config"]').val();
+		try{
+			var obj = JSON.parse(str);
+		}catch{
+			layer.msg("JSON 格式错误");
+			return;
+		}
+
+		entity.config = str;
+		$.ajax({
+			type: "PUT",
+			url: baseurl + entity.id,
+			data: JSON.stringify(entity),
+			dataType: "json",
+			contentType:"application/json",
+			success: function(data) {
+			}
+		});
+		
+		$('#SaveConfigBtn').hide();
+		$('#EditConfig').hide();
+		$('#EditConfigBtn').show();
+		$('#ViewConfig').show();
+		
+		$('.layui-code').text(entity.config);
+		layui.code({
+			title: 'JSON',
+			height: '600px',
+			//,skin: 'notepad'
+			about: false
+		});
+		
+	});
+
+	$('#EditConfigBtn').on('click', function(){
+		$('#EditConfigBtn').hide();
+		$('#ViewConfig').hide();
+		$('#SaveConfigBtn').show();
+		$('#EditConfig').show();
+	});
+
+	$('#ViewConfigBtn').on('click', function(){
+		var str = $('textarea[name="config"]').val();
+		var model;
+		try{
+			model = JSON.parse(str);
+		}catch{
+			layer.msg("JSON 格式错误");
+			return;
+		}
+		buildConfigUI($('#ViewConfigDialog'), model);
+		layer.open({
+				type: 1,
+				title: '配置预览',
+				area: '500px',
+				maxWidth: 780,
+				content: $('#ViewConfigDialog'),
+				success: function(layero, index){
+					form.render();
+				}
+			});
+	});
+	
+	configTable = table.render({
+		elem: '#ConfigTable',
+		toolbar: '#ConfigTableToolBar',
+		url: configurl,
+		where: criteria,
+		page: true,
+		height:'full-0',
+		cols: [[
+			{type:'checkbox', fixed: 'left'},
+			{field: 'id', title: 'ID'},
+			{field: 'name', title: '配置名'},
+			{field: 'tag', title: '标签'},
+			{field: 'createTime', title: '创建时间'},
+			{field: 'updateTime', title: '更新时间'},
+			{fixed: 'right', title:'操作', toolbar:'#ConfigTableRowToolBar', width:160}
+		]],
+		done: function(){
+			form.val('SearchPanel', criteria);
+		}
+	});
+	
+	var editOption = {
+			type: 1,
+			title: '添加配置',
+			data:{},
+			area: '500px',
+			maxWidth: 780,
+			content: $('#ConfigDialog'),
+			btn: ['保存'],
+			yes: function(index, layero){
+				layer.msg("Save");
+				layer.close(index);
+				var configEntity =  new Object();
+				var config = new Object();
+				$("#ConfigForm form").each(function(){
+					var name = $(this).attr("name");
+					if(name){
+						var group =  new Object();
+						var array = $(this).serializeArray();
+					    $.each(array, function() {
+					    	group[this.name] = this.value;
+					    });
+						config[name] = group;
+					}
+				});
+				configEntity.config = JSON.stringify(config);
+
+				var array = $("form#ProductConfig").serializeArray();
+			    $.each(array, function() {
+			    	configEntity[this.name] = this.value;
+			    });
+				//console.log(configEntity);
+
+				if(configEntity.id > 0){
+					$.ajax({
+						type: "PUT",
+						url: configurl + configEntity.id,
+						data: JSON.stringify(configEntity),
+						dataType: "json",
+						contentType:"application/json",
+						success: function(data) {
+							table.reload('ConfigTable');
+						}
+					});
+				}else{
+					configEntity.productId = params["id"];
+					$.ajax({
+						type: "POST",
+						url: configurl,
+						data: JSON.stringify(configEntity),
+						dataType: "json",
+						contentType:"application/json",
+						success: function(data) {
+							table.reload('ConfigTable', {
+								page: {
+									curr: 1 //重新从第 1 页开始
+								}
+							});
+						}
+					});
+				}
+			},
+			success: function(layero, index){
+				//构建配置界面
+				var model = JSON.parse(entity.config);
+				buildConfigUI($('#ConfigTab'), model);
+				form.render();
+				//配置项表单赋值
+				//console.log(this.data);
+				if(this.data){
+					form.val("ProductConfig",this.data);
+					try{
+						var config = JSON.parse(this.data.config);
+						$.each(config, function(name, val) {  
+							form.val(name, val);
+						});  
+					}catch{
+						layer.msg("JSON 格式错误");
+						return;
+					}
+				}else{
+					$("#ProductConfig input").val("");
+				}
+			}
+		}
+	
+	//监听开关按钮事件
+	form.on('switch', function(data){
+		$(data.elem).val(data.elem.checked);
+	});
+	
+	//监听搜索表单提交
+	form.on('submit(Search)', function(data){
+		criteria.search = data.field.search;
+		table.reload('ConfigTable', {
+			page: {
+				curr: 1 //重新从第 1 页开始
+			},
+			where: criteria
+		});
+		return false;
+	});
+	  
+	//监听表单提交
+/* 	form.on('submit(Save)', function(data){
+		layer.close(editDlgIdx);
+		var config = data.field;
+		if(config.id > 0){
+			$.ajax({
+				type: "PUT",
+				url: configurl + config.id,
+				data: JSON.stringify(config),
+				dataType: "json",
+				contentType:"application/json",
+				success: function(data) {
+					table.reload('ConfigTable');
+				}
+			});
+		}else{
+			$.ajax({
+				type: "POST",
+				url: configurl,
+				data: JSON.stringify(config),
+				dataType: "json",
+				contentType:"application/json",
+				success: function(data) {
+					table.reload('ConfigTable', {
+						page: {
+							curr: 1 //重新从第 1 页开始
+						}
+					});
+				}
+			});
+		}
+		return false;
+	}); */
+
+	//Table工具栏事件
+	table.on('toolbar(ConfigTable)', function(obj){
+		switch(obj.event){
+			case 'add':
+				editOption.title = '添加配置';
+				editOption.data = null;
+				editDlgIdx = layer.open(editOption);
+				break;
+			case 'delete':
+				var status = table.checkStatus('ConfigTable');
+				if(status.data.length<=0){
+					layer.msg("未选中任何配置");
+					break;
+				}
+				layer.confirm('确认删除所选配置？', {icon: 2, title:'删除'}, function(index){
+					layer.close(index);
+					status.data.forEach(function(data){
+						$.ajax({
+							type: "DELETE",
+							url: configurl + data.id,
+							success: function(data) {
+								table.reload('ConfigTable');
+							}
+						});
+					});
+				});
+				break;
+		};
+	});//监听行工具事件
+	table.on('tool(ConfigTable)', function(obj){
+		switch(obj.event){
+		case 'modify':
+			editOption.title = '编辑配置';
+			editOption.data = obj.data;
+			editDlgIdx = layer.open(editOption);
+			break;
+		case 'delete':
+			layer.confirm('确认删除配置：'+obj.data.name, {icon: 2, title:'删除'}, function(index){
+				layer.close(index);
+				$.ajax({
+					type: "DELETE",
+					url: configurl+obj.data.id,
+					success: function(data) {
+						obj.del();
+					}
+				});
+			});
+			break;
+		};
+	});
+});
+</script>
+</body>
+</html>

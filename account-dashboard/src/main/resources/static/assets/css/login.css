@@ -1,0 +1,78 @@
+html{
+	height: 100%;
+}
+
+body{
+	background-image: url(../background.png);
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+	-moz-background-size: 100% 100%;
+}
+
+#loginWraper{
+	text-align:center;
+	margin:0 auto;
+	margin-top: 200px;
+	width: 502px;
+}
+
+#login{
+	padding: 20px 80px 30px;
+	border-radius: 5px;
+	border: 1px solid #e6e6e6;
+	background: #ffffff;
+}
+
+#login a{
+	color: #666;
+}
+
+#login .layui-form-pane .login-label{
+	width: 50px;
+}
+
+#login .layui-form-item {
+    margin-bottom: 20px;
+}
+
+#login .layui-form-item .login-input{
+	width: 280px;
+}
+
+#registerWraper{
+	text-align:center;
+	margin:0 auto;
+	margin-top: 200px;
+	width: 460px;
+}
+
+#register{
+	padding: 20px 50px 20px;
+	border-radius: 5px;
+	border: 1px solid #e6e6e6;
+	background: #ffffff;
+}
+
+#register a{
+	color: #666;
+}
+
+#register .layui-form-label{
+	width: 90px;
+	padding: 8px 10px;
+}
+
+#register .layui-input-block {
+    margin-left: 90px;
+}
+
+.beian{
+	position:absolute;
+	right:0px;
+	bottom:0px;
+	margin-right:10px;
+	margin-bottom:3px;
+}
+.beian a{
+	color:#ccc;
+}

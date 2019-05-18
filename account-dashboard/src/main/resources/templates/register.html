@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" th:with="system=${@systemConfig}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="">
+<meta name="author" content="">
+<title th:text="${'Register - ' + system?.title}"></title>
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/css/layui.css')}">
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/css/login.css')}">
+</head>
+<body class="layui-layout-body">
+<div class="layui-layout">
+	<div id="registerWraper">
+		<div id="register">
+			<div><h1 style="font-weight:bold;color:#009688;padding:15px 0;" th:text="${system?.title}"></h1></div>
+			<div class="layui-tab layui-tab-brief">
+				<ul class="layui-tab-title">
+					<li class="layui-this">手机号注册</li>
+					<li>邮箱注册</li>
+				</ul>
+				<div class="layui-tab-content" style="padding-top: 25px;">
+					<div class="layui-tab-item layui-show">
+						<form class="layui-form layui-form-pane" method="post" action="/api/account/register">
+						  <div class="layui-form-item">
+							<label class="layui-form-label">手机号</label>
+						    <div class="layui-input-block">
+						      <input type="text" name="phone" required  lay-verify="required" placeholder="电话号码" autocomplete="off" class="layui-input">
+						    </div>
+						  </div>
+						  <div class="layui-form-item">
+							<label class="layui-form-label">密码</label>
+						    <div class="layui-input-block">
+						      <input type="password" name="password" required  lay-verify="required" placeholder="密码" autocomplete="new-password" class="layui-input">
+						    </div>
+						  </div>
+						  <div class="layui-form-item">
+							<label class="layui-form-label">确认密码</label>
+						    <div class="layui-input-block">
+						      <input type="password" name="confirm" required  lay-verify="required" placeholder="确认密码" autocomplete="new-password" class="layui-input">
+						    </div>
+						  </div>
+						  <div class="layui-form-item">
+							<label class="layui-form-label">验证码</label>
+						    <div class="layui-input-inline" style="width:130px">
+						      <input type="text" name="captche" required lay-verify="required" placeholder="短信验证码" autocomplete="off" class="layui-input">
+						    </div>
+							<div  style="padding:4px 0">
+							  <button type="button" class="layui-btn layui-btn-sm layui-btn-normal captche" id="SmsCaptche">获取验证码</button>
+							</div>
+						  </div>
+						  <div class="layui-form-item" style="margin-bottom: 0px;padding-top: 10px;">
+						      <span style="float:left;margin-left:10px;line-height:38px;"><a href="/login">已有账号?登录</a></span>
+						      <button class="layui-btn" style="float:right;margin-right:10px" lay-submit lay-filter="Register">注册</button>
+						  </div>
+						</form>
+					</div>
+					<div class="layui-tab-item">
+						<form class="layui-form layui-form-pane" method="post" action="/api/account/register">
+						  <div class="layui-form-item">
+							<label class="layui-form-label">邮箱</label>
+						    <div class="layui-input-block">
+						      <input type="text" name="email" required  lay-verify="required" placeholder="邮箱" autocomplete="off" class="layui-input">
+						    </div>
+						  </div>
+						  <div class="layui-form-item">
+							<label class="layui-form-label">密码</label>
+						    <div class="layui-input-block">
+						      <input type="password" name="password" required  lay-verify="required" placeholder="密码" autocomplete="new-password" class="layui-input">
+						    </div>
+						  </div>
+						  <div class="layui-form-item">
+							<label class="layui-form-label">确认密码</label>
+						    <div class="layui-input-block">
+						      <input type="password" name="confirm" required  lay-verify="required" placeholder="确认密码" autocomplete="new-password" class="layui-input">
+						    </div>
+						  </div>
+						  <div class="layui-form-item">
+							<label class="layui-form-label">验证码</label>
+						    <div class="layui-input-inline" style="width:130px">
+						      <input type="text" name="captche" required lay-verify="required" placeholder="邮箱验证码" autocomplete="off" class="layui-input">
+						    </div>
+							<div  style="padding:4px 0">
+							  <button type="button" class="layui-btn layui-btn-sm layui-btn-normal captche" id="EmailCaptche">获取验证码</button>
+							</div>
+						  </div>
+						  <div class="layui-form-item" style="margin-bottom: 0px;padding-top: 10px;">
+						      <span style="float:left;margin-left:10px;line-height:38px;"><a href="/login">已有账号?登录</a></span>
+						      <button class="layui-btn" style="float:right;margin-right:10px" lay-submit lay-filter="Register">注册</button>
+						  </div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="beian">
+	<a href="http://www.miitbeian.gov.cn" target="_blank" th:text="${system?.beian}"></a>
+</div>
+<script type="text/javascript">
+	if (self!=top){
+		window.top.location.replace(self.location);
+	}
+</script>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/layui.js')}"></script>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/js/visit.js')}"></script>
+<script>
+//JavaScript代码区域
+layui.use(['element', 'form', 'layer'], function(){
+	var $ = layui.jquery;
+	var element = layui.element;
+	var form = layui.form;
+	var layer = layui.layer;
+	var invalidlist = [];
+	var count = 60;
+	
+	function disableCaptche(){
+		count = 60;
+		$(".captche").addClass("layui-btn-disabled");
+		$(".captche").attr("disabled","disabled");
+		$(".captche").text("获取验证码("+count+")");
+		setInterval(function(){
+			count--;
+			if(count <= 0){
+				$(".captche").removeClass("layui-btn-disabled");
+				$(".captche").removeAttr("disabled");
+				$(".captche").text("获取验证码");
+			}else{
+				$(".captche").text("获取验证码("+count+")");
+			}
+		},1000);		
+	}
+	
+	function sendCaptche(req,success){
+		if(invalidlist.includes(req.target)){
+			layer.msg("账号已存在！");
+			return;
+		}
+		$.get({
+			url: "/api/account/captche",
+			data:req,
+			success: function(data){
+				console.log(data);
+				if(data.code == 0){
+					layer.msg("验证码已发送");
+					disableCaptche();
+					success();
+				}else if(data.code == 435 || data.code == 436){
+					layer.msg("账号已存在！");
+					invalidlist.push(req.target);
+				}
+			},
+			error: function(xhr, status, error){
+				console.log("ajax failed, status:" + xhr.status);
+			}
+		});
+	}
+
+	$("#SmsCaptche").on('click', function() {
+		var req = {type:'phone'};
+		req.target = $("input[name='phone']").val();
+		if(req.target.length <= 0){
+			layer.msg("请输入正确的手机号码！");
+			return;
+		}
+		sendCaptche(req, function(){
+		});
+	});
+
+	$("#EmailCaptche").on('click', function() {
+		var req = {type:'email'};
+		req.target = $("input[name='email']").val();
+		if(req.target.length <= 0){
+			layer.msg("请输入正确的邮件地址！");
+			return;
+		}
+		sendCaptche(req, function(){
+		});
+	});
+	
+	//*
+	form.on('submit(Register)', function(data){
+		var account = data.field;
+		console.log(account);
+		if(account.password != account.confirm){
+			layer.msg('两次输入密码不一致', {icon: 2});
+			return false;
+		}
+		$.ajax({
+			type: "POST",
+			url: '/api/account/register',
+			data: JSON.stringify(account),
+			dataType: "json",
+			contentType:"application/json",
+			success: function(result) {
+				if(result.code == 0){
+					window.location = "/";
+				}else{
+					console.log(result);
+					if(data.code == 435 || data.code == 436){
+						layer.msg("账号已存在！");
+						if(data.code == 435){
+							invalidlist.push(account.phone);
+						}else if(data.code == 436){
+							invalidlist.push(account.email);
+						}
+					}else{
+						layer.msg(result.desc);
+					}
+				}
+			},
+			error: function(result){
+				layer.msg("注册失败");
+			}
+		});
+		return false;
+	});
+	//*/
+  
+});
+</script>
+</body>
+</html>
