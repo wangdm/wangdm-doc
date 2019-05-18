@@ -16,6 +16,12 @@
 	<name>Wangdm-Doc</name>
 	<description>Online Documents System</description>
 
+	<properties>
+		<wangdm.framework.version>0.0.1-SNAPSHOT</wangdm.framework.version>
+		<wangdm.doc.version>${project.version}</wangdm.doc.version>
+		<docker.image.prefix>registry.wangdm.cn/wangdm</docker.image.prefix>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

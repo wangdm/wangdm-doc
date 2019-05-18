@@ -11,20 +11,16 @@
 
 	<artifactId>admin-dashboard</artifactId>
 
-	<properties>
-		<docker.image.prefix>registry.wangdm.cn/wangdm</docker.image.prefix>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>cn.wangdm.doc</groupId>
 			<artifactId>doc-common</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${wangdm.doc.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>cn.wangdm</groupId>
 			<artifactId>perm-common</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${wangdm.framework.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
