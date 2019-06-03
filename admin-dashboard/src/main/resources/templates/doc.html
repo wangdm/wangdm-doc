@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta th:name="${_csrf?.headerName}" th:content="${_csrf?.token}"/>
+  <title></title>
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/css/layui.css')}">
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/ext/dtree/dtree.css')}">
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/ext/dtree/font/iconfont.css')}">
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/font/iconfont.css')}">
+  <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/css/index.css')}">
+</head>
+<body class="layui-layout-body">
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/layui.js')}"></script>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/js/common.js')}"></script>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/js/smart.js')}"></script>
+<script th:inline="none">
+layui.use(['table','form','element','code'], function(){
+	var $ = layui.jquery;
+	var table = layui.table;
+	var form = layui.form;
+	var element = layui.element;
+	
+	var project;
+	var projectUrl = '/admin/api/project/';
+	
+	var params = getParams(window.location.href);
+	
+	$.ajax({
+		type: "GET",
+		url: projectUrl + params["projectId"],
+		dataType: "json",
+		contentType:"application/json",
+		success: function(data) {
+			project = data.data;
+			console.log(project);
+		}
+	});
+});
+</script>
+</body>
+</html>
