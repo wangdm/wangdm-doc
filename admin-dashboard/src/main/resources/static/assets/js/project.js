@@ -13,7 +13,7 @@ layui.use(['table','form'], function(){
 	var mainTableData;
 	var editDlgIdx;
 	var accountTable, accountDlgIdx;
-	var baseurl = '/admin/api/app/';
+	var baseurl = '/admin/api/project/';
 	
 	mainTable = table.render({
 		elem: '#MainTable',
@@ -25,10 +25,11 @@ layui.use(['table','form'], function(){
 		cols: [[
 			{type:'checkbox', fixed: 'left'},
 			{field: 'id', title: 'ID'},
-			{field: 'accountId', title: '账户'},
 			{field: 'name', title: '名称'},
-			{field: 'appKey', title: 'AppKey'},
-			{field: 'appSecret', title: 'AppSecret', hide:true},
+			{field: 'accountId', title: '账户'},
+			{field: 'accountName', title: '账户', hide: true},
+			{field: 'type', title: '类型'},
+			{field: 'domain', title: '域名'},
 			{field: 'createTime', title: '创建时间'},
 			{field: 'updateTime', title: '修改时间'},
 			{field: 'status', title: '状态', width:60, templet: function(d){
@@ -52,39 +53,21 @@ layui.use(['table','form'], function(){
 	
 	var dlgOption = {
 			type: 1,
-			title: '添加应用',
+			title: '添加项目',
 			data:{},
+			area:['400px'],
 			maxWidth: 780,
 			content: $('#EditDialog'),
 			yes: function(index, layero){
 				layer.msg("Save");
 				layer.close(index);
 			},
-			btn2: function(index, layero){
-				layer.confirm("确认退出编辑？",function(idx){
-					layer.close(idx);
-					layer.close(index);
-				});
-				return false;
-			},
-			cancel: function(index, layero){
-				layer.confirm("确认退出编辑？",function(idx){
-					layer.close(idx);
-					layer.close(index);
-				});
-				return false;
-			},
 			success: function(layero, index){
-				var acstype = dict["acstype"];
-				$("select[name='type']").empty();
-				for(var idx in acstype){
-					$("select[name='type']").append("<option value='"+acstype[idx].value+"'>"+acstype[idx].name+"</option>");
-				}
-				form.render('select');
+				form.render();
 				if(this.data){
 					form.val("EditDialog",this.data);
 				}else{
-					$("#EditDialog input").val("");
+					//$("#EditDialog input").val("");
 				}
 			}
 		}
@@ -161,10 +144,16 @@ layui.use(['table','form'], function(){
 		return false;
 	});
 	  
+	form.on('radio(type)', function(data){
+		  console.log(data.elem); //得到radio原始DOM对象
+		  console.log(data.value); //被点击的radio的value值
+		});  
+	
 	//监听表单提交
 	form.on('submit(Save)', function(data){
 		layer.close(editDlgIdx);
 		var entity = data.field;
+		console.log(entity);
 		if(entity.id > 0){
 			$.ajax({
 				type: "PUT",
@@ -209,7 +198,7 @@ layui.use(['table','form'], function(){
 		switch(obj.event){
 		case 'add':
 			if(criteria.accountId > 0){
-				dlgOption.title = '添加应用';
+				dlgOption.title = '添加项目';
 				dlgOption.data = null;
 				editDlgIdx = layer.open(dlgOption);
 			}else{
@@ -219,10 +208,10 @@ layui.use(['table','form'], function(){
 		case 'verify':
 			var status = table.checkStatus('MainTable');
 			if(status.data.length<=0){
-				layer.msg("未选中任何应用");
+				layer.msg("未选中任何项目");
 				break;
 			}
-			layer.confirm('确认审核所选应用？', {icon: 1, title:'审核'}, function(index){
+			layer.confirm('确认审核所选项目？', {icon: 1, title:'审核'}, function(index){
 				layer.close(index);
 				var ids = [];
 				status.data.forEach(function(data){
@@ -249,10 +238,10 @@ layui.use(['table','form'], function(){
 		case 'restore':
 			var status = table.checkStatus('MainTable');
 			if(status.data.length<=0){
-				layer.msg("未选中任何应用");
+				layer.msg("未选中任何项目");
 				break;
 			}
-			layer.confirm('确认恢复所选应用？', {icon: 1, title:'恢复'}, function(index){
+			layer.confirm('确认恢复所选项目？', {icon: 1, title:'恢复'}, function(index){
 				layer.close(index);
 				var ids = [];
 				status.data.forEach(function(data){
@@ -279,10 +268,10 @@ layui.use(['table','form'], function(){
 		case 'forbid':
 			var status = table.checkStatus('MainTable');
 			if(status.data.length<=0){
-				layer.msg("未选中任何应用");
+				layer.msg("未选中任何项目");
 				break;
 			}
-			layer.confirm('确认禁用所选应用？', {icon: 2, title:'禁用'}, function(index){
+			layer.confirm('确认禁用所选项目？', {icon: 2, title:'禁用'}, function(index){
 				layer.close(index);
 				var ids = [];
 				status.data.forEach(function(data){
@@ -309,10 +298,10 @@ layui.use(['table','form'], function(){
 		case 'delete':
 			var status = table.checkStatus('MainTable');
 			if(status.data.length<=0){
-				layer.msg("未选中任何应用");
+				layer.msg("未选中任何项目");
 				break;
 			}
-			layer.confirm('确认删除所选应用？', {icon: 2, title:'删除'}, function(index){
+			layer.confirm('确认删除所选项目？', {icon: 2, title:'删除'}, function(index){
 				layer.close(index);
 				var ids = [];
 				status.data.forEach(function(data){
@@ -345,12 +334,12 @@ layui.use(['table','form'], function(){
 	table.on('tool(MainTable)', function(obj){
 		switch(obj.event){
 		case 'modify':
-			dlgOption.title = '编辑应用';
+			dlgOption.title = '编辑项目';
 			dlgOption.data = obj.data;
 			editDlgIdx = layer.open(dlgOption);
 			break;
 		case 'delete':
-			layer.confirm('确认删除应用：'+obj.data.name, {icon: 2, title:'删除'}, function(index){
+			layer.confirm('确认删除项目：'+obj.data.name, {icon: 2, title:'删除'}, function(index){
 				layer.close(index);
 				$.ajax({
 					type: "DELETE",

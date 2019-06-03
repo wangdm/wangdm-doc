@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="zh" xmlns:th="http://www.thymeleaf.org" th:with="system=${@systemConfig}">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="description" content="">
-<meta name="author" content="">
-<title th:text="${'Login - ' + system?.title}"></title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta th:name="${_csrf?.headerName}" th:content="${_csrf?.token}"/>
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <title th:text="${'Login - ' + system?.title}"></title>
   <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/css/layui.css')}">
   <link rel="stylesheet" th:href="${@mvcResourceUrlProvider.getForLookupPath('/assets/css/login.css')}">
 </head>
@@ -48,6 +49,7 @@
 	}
 </script>
 <script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/lib/layui/layui.js')}"></script>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/assets/js/common.js')}"></script>
 <script>
 //JavaScript代码区域
 layui.use(['element', 'form', 'layer'], function(){
@@ -63,6 +65,7 @@ layui.use(['element', 'form', 'layer'], function(){
 			type: "POST",
 			url: '/login',
 			data: user,
+			contentType : "application/x-www-form-urlencoded",
 			success: function(result) {
 				window.location = "/";
 			},

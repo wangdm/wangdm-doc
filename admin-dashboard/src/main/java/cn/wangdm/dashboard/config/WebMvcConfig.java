@@ -15,12 +15,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		registry.addViewController("/login").setViewName("login");
 		registry.addViewController("/logout").setViewName("logout");
 		
-		registry.addViewController("/app/list").setViewName("app/list");	
-		registry.addViewController("/app/verify").setViewName("app/verify");
-		registry.addViewController("/app/delete").setViewName("app/delete");
-		registry.addViewController("/dev/device").setViewName("dev/device");
-		registry.addViewController("/dev/product").setViewName("dev/product");
-		registry.addViewController("/dev/firmware").setViewName("dev/firmware");
+		registry.addViewController("/project/list").setViewName("project/list");	
+		registry.addViewController("/project/verify").setViewName("project/verify");
+		registry.addViewController("/project/delete").setViewName("project/delete");
 		registry.addViewController("/account/list").setViewName("account/list");
 		registry.addViewController("/account/verify").setViewName("account/verify");
 		registry.addViewController("/account/delete").setViewName("account/delete");

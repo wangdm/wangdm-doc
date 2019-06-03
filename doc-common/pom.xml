@@ -12,11 +12,33 @@
 	<artifactId>doc-common</artifactId>
 
 	<dependencies>
+	
 		<dependency>
 			<groupId>cn.wangdm</groupId>
 			<artifactId>base-common</artifactId>
 			<version>${wangdm.framework.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>cn.wangdm</groupId>
+			<artifactId>account-common</artifactId>
+			<version>${wangdm.framework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>cn.wangdm</groupId>
+			<artifactId>mail-common</artifactId>
+			<version>${wangdm.framework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>cn.wangdm</groupId>
+			<artifactId>sms-common</artifactId>
+			<version>${wangdm.framework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>cn.wangdm</groupId>
+			<artifactId>file-common</artifactId>
+			<version>${wangdm.framework.version}</version>
+		</dependency>
+		
 	</dependencies>
 	
 </project>

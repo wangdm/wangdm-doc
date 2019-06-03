@@ -12,8 +12,9 @@ layui.config({
     select: 'js/ext/select'
 });
 
-layui.use(['jquery'], function(){
+layui.use(['jquery', 'element'], function(){
 	$ = layui.jquery;
+	element = layui.element;
 });
 
 var dtreeDefaultRequest = {

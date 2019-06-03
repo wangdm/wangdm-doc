@@ -1,4 +1,7 @@
 wangdm:
+   account:
+      security:
+         enable: false
    datasource:
       host: www.wangdm.cn
       dbname: WangdmDoc
@@ -20,7 +23,7 @@ spring:
             max-age: 864000
    session:
       store-type: redis
-      timeout: 100
+      timeout: 1800
       redis:
          flush-mode: on-save
          namespace: doc:admin:session
